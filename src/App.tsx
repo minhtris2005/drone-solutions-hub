@@ -7,9 +7,9 @@ import ScrollToTop from './components/ScrollToTop';
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import HeroSection from "@/components/HeroSection";
-import FloatingVideo from "@/components/FloatingVideo";
 
 import { AuthProvider } from './contexts/AuthContext'
+import { LanguageProvider } from './contexts/LanguageContext' // Thêm import này
 import ProtectedRoute from "./components/admin/ProtectedRoute";
 
 // Import public pages
@@ -54,9 +54,7 @@ const AppContent = () => {
   return (
     <>
       {!isAdminRoute && <Navbar />}
-      {!isAdminRoute && showHero && <HeroSection />}
       {/* Chỉ hiện FloatingVideo trên public routes, không hiện trên admin */}
-      {!isAdminRoute && <FloatingVideo />}
       <Routes>
         {/* ========== ADMIN ROUTES ========== */}
         <Route path="/admin/login" element={<AdminLogin />} />
@@ -110,10 +108,13 @@ const App = () => (
       <Toaster />
       <Sonner />
       <AuthProvider>
-        <BrowserRouter>
-          <ScrollToTop />
-          <AppContent />
-        </BrowserRouter>
+        {/* Bọc ứng dụng bằng LanguageProvider */}
+        <LanguageProvider>
+          <BrowserRouter>
+            <ScrollToTop />
+            <AppContent />
+          </BrowserRouter>
+        </LanguageProvider>
       </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>

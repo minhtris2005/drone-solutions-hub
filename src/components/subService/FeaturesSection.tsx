@@ -19,10 +19,13 @@ export default function FeaturesSection({
   title,
   highlightedText,
   features,
-  backgroundColor = "bg-light-gray",
+  backgroundColor = "bg-secondary",
   cardBackground = "bg-card",
   highlightColor = "text-vibrant-red",
 }: FeaturesSectionProps) {
+  const featureCount = features.length;
+  const gridColumns = featureCount <= 4 ? featureCount : 4;
+
   return (
     <section className={`py-20 ${backgroundColor}`}>
       <div className="container mx-auto px-4">
@@ -32,7 +35,10 @@ export default function FeaturesSection({
             {highlightedText && <span className={highlightColor}> {highlightedText}</span>}
           </h2>
         </div>
-        <div className="grid md:grid-cols-3 gap-8">
+        <div 
+          className="grid gap-8"
+          style={{ gridTemplateColumns: `repeat(${gridColumns}, 1fr)` }}
+        >
           {features.map((feature, index) => (
             <div
               key={index}

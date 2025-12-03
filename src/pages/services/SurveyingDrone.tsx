@@ -1,4 +1,3 @@
-// pages/services/drone-repair.tsx
 import HeroBanner from "@/components/subService/HeroBanner";
 import FeaturesSection from "@/components/subService/FeaturesSection";
 import ProcessTimeline from "@/components/subService/ProcessTimeline";
@@ -33,15 +32,15 @@ export default function SurveyingDrone() {
     highlightedText: "Drone Trắc Địa",
     features: [
       {
-        icon: icon2,
+        icon: icon1,
         title: "Khảo sát địa hình phục vụ xây dựng, quy hoạch đô thị, mỏ khai thác.",
       },
       {
-        icon: icon3,
+        icon: icon2,
         title: "Lập bản đồ 2D/3D, mô hình mặt đất (DEM/DTM), orthophoto và mesh 3D.",
       },
       {
-        icon: icon1,
+        icon: icon3,
         title: "Đo diện tích, thể tích khối vật liệu, giám sát tiến độ thi công.",
       }
     ]

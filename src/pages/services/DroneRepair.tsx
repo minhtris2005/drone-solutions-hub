@@ -7,9 +7,9 @@ import FAQSection from "@/components/subService/FAQSection";
 import { CheckCircle } from "lucide-react";
 
 import fix from "@/assets/services/repairing_drone/fix.png";
-import icon1 from "@/assets/services/repairing_drone/icon1.png";
-import icon2 from "@/assets/services/repairing_drone/icon2.png";
-import icon3 from "@/assets/services/repairing_drone/icon3.png";
+import icon1 from "@/assets/services/repairing_drone/icon2.png";
+import icon2 from "@/assets/services/repairing_drone/icon3.png";
+import icon3 from "@/assets/services/repairing_drone/icon1.png";
 
 export default function DroneRepair() {
   // Dữ liệu cho HeroBanner
@@ -33,17 +33,17 @@ export default function DroneRepair() {
     highlightedText: "Hitek Flycam",
     features: [
       {
-        icon: icon2,
+        icon: icon1,
         title: "Kiểm tra & Thay thế linh kiện",
         description: "Kiểm tra tổng thể, chẩn đoán lỗi, thay thế linh kiện"
       },
       {
-        icon: icon3,
+        icon: icon2,
         title: "Cập nhật & Hiệu chuẩn hệ thống bay",
         description: "Cập nhật phần mềm, hiệu chuẩn cảm biến IMU, compass, hệ thống GPS"
       },
       {
-        icon: icon1,
+        icon: icon3,
         title: "Kiểm tra an toàn & Bảo hành sau sữa chữa",
         description: "Kiểm tra an toàn trước và sau bay, bảo hành dịch vụ sửa chữa"
       }
@@ -72,7 +72,7 @@ export default function DroneRepair() {
       },
       {
         step: "05",
-        title: "Thử bay kiểm định (nếu cần) hoặc kiểm tra hệ thống kết nối dữ liệu & truyền hình ảnh, ghi lại báo cáo",
+        title: "Bàn giao thiết bị, cung cấp biên bản sửa chữa và bảo hành, hướng dẫn khách hàng về quy trình vận hành tiếp theo.",
       }
     ]
   };
@@ -81,7 +81,7 @@ export default function DroneRepair() {
   const benefitsData = {
     imageUrl : "https://victory.com.vn/wp-content/uploads/2022/12/mavic-3m-nong-nghiep-5.png",
     title: "Lợi ích",
-    highlightedText: "cho khách hàng",
+    highlightedText: "dành cho khách hàng",
     benefits: [
       {
         icon: CheckCircle,

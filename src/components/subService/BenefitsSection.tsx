@@ -31,7 +31,7 @@ export default function BenefitsSection({
   imageUrl,
   imageAlt = "Benefits illustration",
   imagePosition = 'left',
-  backgroundColor = "bg-background",
+  backgroundColor = "bg-secondary",
   highlightColor = "text-primary",
   iconColor = "bg-primary",
   subtitle,

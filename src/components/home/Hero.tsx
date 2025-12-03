@@ -165,7 +165,6 @@ export default function Hero() {
             ].map((stat, index) => (
               <motion.div
                 key={index}
-                whileHover={{ scale: 1.05, y: -5 }}
                 className="bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-border"
               >
                 <div className="text-2xl md:text-3xl font-bold text-primary mb-1">

@@ -152,30 +152,7 @@ export default function Hero() {
             </p>
           </motion.div>
 
-          {/* Stats */}
-          <motion.div
-            variants={itemVariants}
-            className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10 max-w-3xl mx-auto"
-          >
-            {[
-              { number: "5+", label: "Năm kinh nghiệm" },
-              { number: "500+", label: "Drone sửa chữa" },
-              { number: "100+", label: "Dự án thành công" },
-              { number: "98%", label: "Khách hàng hài lòng" }
-            ].map((stat, index) => (
-              <motion.div
-                key={index}
-                className="bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-border"
-              >
-                <div className="text-2xl md:text-3xl font-bold text-primary mb-1">
-                  {stat.number}
-                </div>
-                <div className="text-sm text-foreground font-medium">
-                  {stat.label}
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
+
 
           {/* CTA Buttons */}
           <motion.div

@@ -36,7 +36,7 @@ const teamMembers = [
 
 const TeamSection = () => {
   return (
-    <section className="py-20 bg-light-gray">
+    <section className="py-20 bg-background">
       <div className="container mx-auto px-4">
         <h2 className="text-4xl font-bold text-center text-foreground mb-16">
           Đội ngũ lãnh đạo

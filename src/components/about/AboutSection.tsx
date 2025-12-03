@@ -127,7 +127,7 @@ const AboutSection = () => {
 
   return (
     <motion.section 
-      className="py-20 bg-light-gray relative overflow-hidden"
+      className="py-20 bg-secondary"
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, amount: 0.3 }}
@@ -166,7 +166,7 @@ const AboutSection = () => {
           >
             <motion.h2 
               variants={titleVariants}
-              className="text-4xl font-bold text-pure-black mb-6"
+              className="text-4xl font-bold text-foreground mb-6"
             >
               Về{" "}
               <motion.span 
@@ -189,13 +189,12 @@ const AboutSection = () => {
             <div className="space-y-4 text-pure-black">
               <motion.p 
                 variants={paragraphVariants}
-                className="leading-relaxed"
+                className="leading-relaxed text-foreground"
               >
                 <motion.span 
-                  className="text-pure-black font-bold"
+                  className=" font-bold text-foreground"
                   whileHover={{ 
                     scale: 1.05,
-                    color: "#dc2626",
                     transition: { type: "spring", stiffness: 400 }
                   }}
                 >
@@ -210,7 +209,7 @@ const AboutSection = () => {
               <motion.p 
                 variants={paragraphVariants}
                 transition={{ delay: 0.1 }}
-                className="leading-relaxed"
+                className="leading-relaxed text-foreground"
               >
                 Thuộc Hitek Group JSC, Hitek Flycam mở rộng sứ mệnh của Hitek Drone sang 
                 các lĩnh vực kỹ thuật, khảo sát, logistics và dịch vụ công nghiệp, với mục 
@@ -265,7 +264,7 @@ const AboutSection = () => {
 
             {/* Floating drone icon */}
             <motion.div
-              className="absolute -top-4 -right-4 w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center"
+              className="absolute -top-4 -right-4 w-12 h-12 bg-background rounded-full shadow-lg flex items-center justify-center"
               animate={{
                 y: [0, -10, 0],
                 rotate: [0, 5, 0, -5, 0]
@@ -283,25 +282,7 @@ const AboutSection = () => {
             </motion.div>
 
             {/* Decorative corner elements */}
-            {[...Array(2)].map((_, i) => (
-              <motion.div
-                key={i}
-                className={`absolute ${i === 0 ? 'top-0 left-0' : 'bottom-0 right-0'} w-8 h-8 border-${i === 0 ? 't-2 l-2' : 'b-2 r-2'} border-vibrant-red`}
-                initial={{ 
-                  opacity: 0,
-                  scale: 0.5 
-                }}
-                whileInView={{ 
-                  opacity: 1,
-                  scale: 1 
-                }}
-                viewport={{ once: true }}
-                transition={{ 
-                  delay: 0.8 + i * 0.2,
-                  type: "spring" 
-                }}
-              />
-            ))}
+
           </motion.div>
         </div>
       </div>

@@ -1,278 +1,147 @@
-
-import { Wrench, Clock, Shield, CheckCircle, ArrowRight, Plus, Minus } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { Wrench, Clock, Shield, CheckCircle } from "lucide-react";
 import bg from "@/assets/services/importing_drone/bg.jpg";
+import HeroBanner from "@/components/subService/HeroBanner";
+import FeaturesSection from "@/components/subService/FeaturesSection";
+import ProcessTimeline from "@/components/subService/ProcessTimeline";
+import BenefitsSection from "@/components/subService/BenefitsSection";
+import FAQSection from "@/components/subService/FAQSection";
+
 export default function DroneImport() {
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
+  // Dữ liệu cho HeroBanner
+  const heroData = {
+    title: "NHẬP KHẨU DRONE",
+    subtitle: (
+      <>
+        Giải pháp nhập khẩu, phân phối và tư vấn lựa chọn thiết bị drone công nghiệp,<br />
+        giúp doanh nghiệp sở hữu thiết bị hợp pháp, chính hãng, tối ưu cho từng lĩnh vực sử dụng.
+      </>
+    ),
+    backgroundImage: bg,
+    height: "400px",
+    titleSize: "text-6xl",
+    subtitleSize: "text-2xl",
+    overlayOpacity: 0.8,
+    overlayColor: "black"
+  };
 
-  const features = [
-    {
-      icon: Wrench,
-      title: "Tư vấn lựa chọn drone: phù hợp mục đích khảo sát, quay phim, logistics, hoặc nông nghiệp.",
-      description: "Kiểm tra tổng thể, chẩn đoán lỗi, thay thế linh kiện"
-    },
-    {
-      icon: Clock,
-      title: "Hỗ trợ lắp đặt & hiệu chuẩn ban đầu, kiểm định thiết bị.",
-      description: "Cập nhật phần mềm, hiệu chuẩn cảm biến IMU, compass, hệ thống GPS"
-    },
-    {
-      icon: Shield,
-      title: "Thủ tục nhập khẩu: CO, CQ, hải quan, đăng ký và bảo hành chính hãng.",
-      description: "Kiểm tra an toàn trước và sau bay, bảo hành dịch vụ sửa chữa"
-    }
-  ];
+  // Dữ liệu cho FeaturesSection
+  const featuresData = {
+    title: "Phạm vi dịch vụ",
+    features: [
+      {
+        icon: "/path/to/wrench-icon.png", // Thay bằng icon thực tế
+        title: "Tư vấn lựa chọn drone",
+        description: "Phù hợp mục đích khảo sát, quay phim, logistics, hoặc nông nghiệp."
+      },
+      {
+        icon: "/path/to/clock-icon.png", // Thay bằng icon thực tế
+        title: "Hỗ trợ lắp đặt & hiệu chuẩn",
+        description: "Hỗ trợ lắp đặt & hiệu chuẩn ban đầu, kiểm định thiết bị."
+      },
+      {
+        icon: "/path/to/shield-icon.png", // Thay bằng icon thực tế
+        title: "Thủ tục nhập khẩu đầy đủ",
+        description: "CO, CQ, hải quan, đăng ký và bảo hành chính hãng."
+      }
+    ],
+    backgroundColor: "bg-light-gray",
+    highlightColor: "text-vibrant-red"
+  };
 
-  const processes = [
-    {
-      step: "01",
-      title: "Xác định nhu cầu và ngân sách khách hàng.",
-    },
-    {
-      step: "02",
-      title: "Đề xuất thiết bị, model và báo giá minh bạch",
-    },
-    {
-      step: "03",
-      title: "Tiến hành nhập khẩu, làm thủ tục hải quan, kiểm định",
-    },
-    {
-      step: "04",
-      title: "Hỗ trợ lắp đặt & hiệu chuẩn ban đầu, kiểm định thiết bị",
-    },
-  ];
+  // Dữ liệu cho ProcessTimeline
+  const processData = {
+    title: "Quy trình triển khai",
+    processes: [
+      {
+        step: "01",
+        title: "Xác định nhu cầu và ngân sách khách hàng.",
+      },
+      {
+        step: "02",
+        title: "Đề xuất thiết bị, model và báo giá minh bạch",
+      },
+      {
+        step: "03",
+        title: "Tiến hành nhập khẩu, làm thủ tục hải quan, kiểm định",
+      },
+      {
+        step: "04",
+        title: "Hỗ trợ lắp đặt & hiệu chuẩn ban đầu, kiểm định thiết bị",
+      },
+    ],
+    lineColor: "from-vibrant-red/30 via-vibrant-red/50 to-vibrant-red/30",
+    stepColor: "from-vibrant-red to-red-600",
+    backgroundColor: "bg-pure-white"
+  };
 
-  const benefits = [
-  {
-    icon: CheckCircle,
-    parts: [
-      "Rút ngắn thời gian khảo sát ",
-      { text: "tới 70%", bold: true },
-      " so với phương pháp truyền thống"
-    ]
-  },
-  {
-    icon: CheckCircle,
-    parts: [
-      { text: "Sai số thấp, dữ liệu ổn định, xử lý nhanh", bold: true },
-      " dành cho các công trình lớn."
-    ]
-  },
-  {
-    icon: CheckCircle,
-    parts: [
-      "Mọi chuyến bay và dữ liệu đều ",
-      { text: "tuân thủ tiêu chuẩn", bold: true },
-      " pháp lý và kỹ thuật của Hitek Flycam."
-    ]
-  },
-];
+  // Dữ liệu cho BenefitsSection
+  const benefitsData = {
+    title: "Lợi ích dành cho khách hàng",
+    benefits: [
+      {
+        icon: CheckCircle,
+        parts: [
+          "Rút ngắn thời gian khảo sát ",
+          { text: "tới 70%", bold: true },
+          " so với phương pháp truyền thống"
+        ]
+      },
+      {
+        icon: CheckCircle,
+        parts: [
+          { text: "Sai số thấp, dữ liệu ổn định, xử lý nhanh", bold: true },
+          " dành cho các công trình lớn."
+        ]
+      },
+      {
+        icon: CheckCircle,
+        parts: [
+          "Mọi chuyến bay và dữ liệu đều ",
+          { text: "tuân thủ tiêu chuẩn", bold: true },
+          " pháp lý và kỹ thuật của Hitek Flycam."
+        ]
+      },
+    ],
+    backgroundColor: "bg-light-gray",
+    iconColor: "bg-green-500",
+    highlightColor: "text-vibrant-red",
+    columns: "md:grid-cols-2 lg:grid-cols-3" // Custom số cột
+  };
 
-  const faqs = [
-    {
-      question: "Hitek Flycam nhập khẩu những thương hiệu nào?",
-      answer: "chưa có"
-    },
-    {
-      question: "Thủ tục nhập khẩu gồm những gì?",
-      answer: "chưa có"
-    },
-    {
-      question: "Drone có được bảo hành chính hãng không?",
-      answer: "chưa có"
-    },
-    {
-      question: "Có hỗ trợ nào sau khi bàn giao thiết bị không?",
-      answer: "chưa có"
-    },
-  ];
-
-  const toggleFaq = (index: number) => {
-    setOpenFaq(openFaq === index ? null : index);
+  // Dữ liệu cho FAQSection
+  const faqData = {
+    title: "Câu hỏi thường gặp",
+    faqs: [
+      {
+        question: "Hitek Flycam nhập khẩu những thương hiệu nào?",
+        answer: "Chúng tôi chuyên nhập khẩu các thương hiệu drone hàng đầu như DJI, Autel, Parrot và các hãng chuyên dụng khác phù hợp với nhu cầu khảo sát, quay phim, và ứng dụng công nghiệp."
+      },
+      {
+        question: "Thủ tục nhập khẩu gồm những gì?",
+        answer: "Thủ tục bao gồm: Xin giấy phép nhập khẩu, làm thủ tục hải quan, kiểm tra chất lượng, đăng ký thiết bị với cơ quan quản lý và hoàn tất các thủ tục pháp lý theo quy định của Việt Nam."
+      },
+      {
+        question: "Drone có được bảo hành chính hãng không?",
+        answer: "Tất cả drone nhập khẩu qua Hitek Flycam đều được bảo hành chính hãng toàn cầu. Chúng tôi hỗ trợ xử lý các yêu cầu bảo hành và sửa chữa trong thời gian bảo hành theo chính sách của nhà sản xuất."
+      },
+      {
+        question: "Có hỗ trợ nào sau khi bàn giao thiết bị không?",
+        answer: "Chúng tôi hỗ trợ đào tạo sử dụng, hướng dẫn vận hành, cập nhật phần mềm và tư vấn kỹ thuật miễn phí trong 6 tháng đầu. Ngoài ra, chúng tôi còn hỗ trợ dịch vụ bảo trì định kỳ và sửa chữa khi cần."
+      },
+    ],
+    contactText: "Vẫn còn thắc mắc? Liên hệ ngay với chúng tôi",
+    contactButtonText: "Liên hệ tư vấn",
+    backgroundColor: "bg-pure-white",
+    highlightColor: "text-vibrant-red"
   };
 
   return (
     <div className="min-h-screen bg-background">
-     <div className="pt-20">
-      <div className="relative h-[400px] overflow-hidden">
-
-        {/* Lớp bóng mờ màu đen */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black to-black opacity-80" />
-
-        {/* Ảnh nền */}
-        <img
-          src={bg}
-          alt="Drone in sky"
-          className="w-full h-full object-cover object-[center_80%]"
-        />
-
-        {/* Nội dung ở giữa */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          
-
-          <div className="text-white text-center">
-            <h1 className="text-6xl font-bold mb-4">NHẬU KHẨU DRONE</h1>
-            <p className="text-2xl opacity-90">Giải pháp nhập khẩu, phân phối và tư vấn lựa chọn thiết bị drone công nghiệp, <br />giúp
-doanh nghiệp sở hữu thiết bị hợp pháp, chính hãng, tối ưu cho từng lĩnh vực sử dụng.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-      {/* Features Section */}
-      <section className="py-20 bg-light-gray">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-vibrant-red mb-4">
-              Phạm vi dịch vụ
-            </h2>
-          </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            {features.map((feature, index) => (
-              <div
-                key={index}
-                className="bg-card rounded-2xl p-8 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border border-border"
-              >
-                <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <feature.icon className="w-10 h-10 text-primary" />
-                </div>
-                <h3 className="text-2xl font-bold mb-4 text-foreground">
-                  {feature.title}
-                </h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  {feature.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Process Section - Timeline Vertical */}
-<section className="py-20 bg-pure-white">
-  <div className="container mx-auto px-4">
-    <div className="text-center mb-16">
-      <h2 className="text-4xl font-bold text-vibrant-red mb-4">
-        Quy trình triển khai
-      </h2>
-    </div>
-    
-    <div className="max-w-4xl mx-auto">
-      <div className="relative">
-        {/* Timeline line */}
-        <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-vibrant-red/30 via-vibrant-red/50 to-vibrant-red/30 transform -translate-x-1/2" />
-        
-        <div className="space-y-12 lg:space-y-0">
-          {processes.map((process, index) => (
-            <div
-              key={index}
-              className={`relative flex flex-col lg:flex-row items-center gap-8 group ${
-                index % 2 === 0 ? 'lg:flex-row-reverse' : ''
-              }`}
-            >
-              {/* Step Number & Connector */}
-              <div className="flex-shrink-0 relative">
-                <div className="w-20 h-20 bg-gradient-to-br from-vibrant-red to-red-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <span className="text-white font-bold text-2xl">{process.step}</span>
-                </div>
-                {/* Connector dot */}
-                <div className="hidden lg:block absolute top-1/2 -left-4 transform -translate-y-1/2 w-8 h-8 bg-card border-4 border-vibrant-red rounded-full" />
-              </div>
-              
-              {/* Content Card */}
-              <div className="flex-1 bg-card rounded-2xl p-8 shadow-lg border border-border hover:shadow-xl hover:border-vibrant-red/30 transition-all duration-300 group-hover:-translate-y-1">
-                <h3 className="text-2xl font-bold text-foreground mb-4 group-hover:text-vibrant-red transition-colors">
-                  {process.title}
-                </h3>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-      {/* Benefits Section */}
-        <section className="py-20 bg-light-gray">
-        <div className="container mx-auto px-4">
-            <h2 className="text-4xl font-bold text-center text-vibrant-red mb-16">
-            Lợi ích dành cho khách hàng
-            </h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {benefits.map((benefit, index) => (
-                <div
-                key={index}
-                className="relative text-center"
-                >
-                <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <benefit.icon className="w-8 h-8 text-white" />
-                </div>
-                <p className="text-pure-black">
-                    {benefit.parts.map((part, i) => 
-                    typeof part === 'string' ? part : (
-                        <strong key={i} className="font-bold">{part.text}</strong>
-                    )
-                    )}
-                </p>
-                {index < benefits.length - 1 && (
-                    <div className="hidden lg:block absolute top-8 -right-4 w-8 h-0.5 bg-border" />
-                )}
-                </div>
-            ))}
-            </div>
-        </div>
-        </section>
-
-      {/* FAQ Section */}
-      <section className="py-20 bg-pure-white">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-4xl font-bold text-center text-foreground mb-16">
-              Câu hỏi thường gặp
-            </h2>
-            <div className="space-y-4">
-              {faqs.map((faq, index) => (
-                <div
-                  key={index}
-                  className="bg-card rounded-2xl border border-border overflow-hidden"
-                >
-                  <button
-                    onClick={() => toggleFaq(index)}
-                    className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-card/50 transition-colors"
-                  >
-                    <span className="text-lg font-semibold text-foreground pr-4">
-                      {faq.question}
-                    </span>
-                    {openFaq === index ? (
-                      <Minus className="w-5 h-5 text-vibrant-red flex-shrink-0" />
-                    ) : (
-                      <Plus className="w-5 h-5 text-vibrant-red flex-shrink-0" />
-                    )}
-                  </button>
-                  {openFaq === index && (
-                    <div className="px-6 pb-4">
-                      <p className="text-muted-foreground leading-relaxed">
-                        {faq.answer}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-            <div className="text-center mt-12">
-              <p className="text-muted-foreground mb-6">
-                Vẫn còn thắc mắc? Liên hệ ngay với chúng tôi
-              </p>
-              <Button size="lg" className="bg-vibrant-red hover:bg-vibrant-red/90">
-                Liên hệ tư vấn
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
+      <HeroBanner {...heroData} />
+      <FeaturesSection {...featuresData} />
+      <ProcessTimeline {...processData} />
+      <BenefitsSection {...benefitsData} />
+      <FAQSection {...faqData} />
     </div>
   );
 }

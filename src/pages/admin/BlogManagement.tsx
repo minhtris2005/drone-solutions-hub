@@ -39,6 +39,9 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
 
+// Import PreviewModal từ component mới
+import { PreviewModal } from './PreviewModal'
+
 export default function BlogManagement() {
   const [posts, setPosts] = useState<BlogPost[]>([])
   const [filteredPosts, setFilteredPosts] = useState<BlogPost[]>([])
@@ -52,6 +55,9 @@ export default function BlogManagement() {
   const [sortBy, setSortBy] = useState<'date' | 'title' | 'author'>('date')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const [imagePreview, setImagePreview] = useState<{ url: string; name: string } | null>(null)
+  const [previewPost, setPreviewPost] = useState<BlogPost | null>(null)
+  const [showPreviewModal, setShowPreviewModal] = useState(false) // State mới cho modal
+  const [previewMode, setPreviewMode] = useState<'all' | 'single'>('all') // 'all' hoặc 'single'
 
   useEffect(() => {
     fetchPosts()
@@ -193,6 +199,20 @@ export default function BlogManagement() {
     setImagePreview({ url, name });
   }
 
+ 
+  // Hàm mở preview bài viết cụ thể
+  const handlePreviewPost = (post: BlogPost) => {
+    setPreviewMode('single')
+    setPreviewPost(post)
+    setShowPreviewModal(true)
+  }
+
+  // Hàm đóng preview modal
+  const handleClosePreviewModal = () => {
+    setShowPreviewModal(false)
+    setPreviewPost(null)
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -206,6 +226,7 @@ export default function BlogManagement() {
 
   return (
     <div className="space-y-6">
+      {/* ... (giữ nguyên phần header) ... */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
@@ -215,28 +236,28 @@ export default function BlogManagement() {
             Quản lý và xuất bản bài viết cho trang blog của bạn
           </p>
         </div>
-        {/* THÊM NÚT TRỞ VỀ DASHBOARD Ở ĐÂY */}
         <div className="flex gap-2">
           <Button 
-            onClick={() => window.location.href = '/admin'} // hoặc '/dashboard' tùy route của bạn
+            onClick={() => window.location.href = '/admin'}
             variant="outline"
             className="gap-2 border-gray-300 dark:border-gray-700 dark:hover:bg-gray-800"
           >
             <Home className="w-4 h-4" />
             Trở về Dashboard
           </Button>
-        <Button 
-          onClick={() => {
-            setSelectedPost(null)
-            setShowForm(true)
-          }} 
-          className="mr-2 gap-2 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 shadow-md"
-        >
-          <Plus className="w-4 h-4" />
-          Tạo bài viết mới
-        </Button>
+          <Button 
+            onClick={() => {
+              setSelectedPost(null)
+              setShowForm(true)
+            }} 
+            className="mr-2 gap-2 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 shadow-md"
+          >
+            <Plus className="w-4 h-4" />
+            Tạo bài viết mới
+          </Button>
+        </div>
       </div>
-</div>
+
       {/* Filters and Search */}
       <Card>
         <CardContent className="pt-6">
@@ -358,17 +379,6 @@ export default function BlogManagement() {
                             {post.image && (
                               <div className="text-xs text-gray-400 mt-1 flex items-center gap-1">
                                 <span>Ảnh: {post.image.split('/').pop()?.substring(0, 20)}...</span>
-                                <Button
-                                  variant="ghost"
-                                  size="lg"
-                                  className="h-5 w-5 p-0"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDownloadImage(post.image!, post.title);
-                                  }}
-                                >
-                                  <Download className="h-3 w-3" />
-                                </Button>
                               </div>
                             )}
                           </div>
@@ -391,7 +401,7 @@ export default function BlogManagement() {
                             checked={post.status === 'published'}
                             onCheckedChange={() => toggleStatus(post)}
                           />
-                          <span className={`text-sm ${post.status === 'published' ? 'text-green-600' : 'text-gray-500'}`}>
+                          <span className={`text-sm ${post.status === 'published' ? 'text-black-600' : 'text-gray-500'}`}>
                             {post.status === 'published' ? 'Công khai' : 'Nháp'}
                           </span>
                         </div>
@@ -402,64 +412,75 @@ export default function BlogManagement() {
                           {post.date}
                         </div>
                       </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => window.open(`/blog/${post.id}`, '_blank')}
-                            className="h-8 w-8 p-0"
-                          >
-                            <Eye className="h-4 w-4" />
+                    <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      {/* Dropdown Menu */}
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="outline" size="sm" className="h-8 w-8 p-0 hover:bg-vibrant-red">
+                            <MoreVertical className="h-4 w-4" />
                           </Button>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="outline" size="sm" className="h-8 w-8 p-0">
-                                <MoreVertical className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem onClick={() => handleEdit(post)}>
-                                <Edit className="h-4 w-4 mr-2" />
-                                Chỉnh sửa
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => window.open(`/blog/${post.id}`, '_blank')}>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem onClick={() => handleEdit(post)}>
+                            <Edit className="h-4 w-4 mr-2" />
+                            Chỉnh sửa
+                          </DropdownMenuItem>
+                          
+                          {/* Preview Item - chỉ clickable khi là draft */}
+                          <DropdownMenuItem 
+                            onClick={() => post.status === 'draft' && handlePreviewPost(post)}
+                            className={post.status === 'published' ? 'opacity-50 cursor-not-allowed' : ''}
+                            disabled={post.status === 'published'}
+                          >
+                            <Eye className="h-4 w-4 mr-2" />
+                            Xem trước
+                            {post.status === 'published' && <span className="ml-2 text-xs text-gray-500">(Chỉ dành cho bài nháp)</span>}
+                          </DropdownMenuItem>
+                          
+                          {/* Item xem bài viết nếu đã published */}
+                          {post.status === 'published' && (
+                            <DropdownMenuItem onClick={() => window.open(`/blog/${post.id}`, '_blank')}>
+                              <Eye className="h-4 w-4 mr-2" />
+                              Xem bài viết
+                            </DropdownMenuItem>
+                          )}
+                          
+                          <DropdownMenuItem onClick={() => toggleStatus(post)}>
+                            {post.status === 'published' ? (
+                              <>
+                                <EyeOff className="h-4 w-4 mr-2" />
+                                Chuyển sang nháp
+                              </>
+                            ) : (
+                              <>
                                 <Eye className="h-4 w-4 mr-2" />
-                                Xem trước
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => toggleStatus(post)}>
-                                {post.status === 'published' ? (
-                                  <>
-                                    <EyeOff className="h-4 w-4 mr-2" />
-                                    Chuyển sang nháp
-                                  </>
-                                ) : (
-                                  <>
-                                    <Eye className="h-4 w-4 mr-2" />
-                                    Công khai
-                                  </>
-                                )}
-                              </DropdownMenuItem>
-                              {post.image && (
-                                <DropdownMenuItem onClick={() => handleDownloadImage(post.image!, post.title)}>
-                                  <Download className="h-4 w-4 mr-2" />
-                                  Tải ảnh về
-                                </DropdownMenuItem>
-                              )}
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem
-                                onClick={() => setDeleteConfirm(post.id!)}
-                                className="text-red-600"
-                              >
-                                <Trash2 className="h-4 w-4 mr-2" />
-                                Xóa
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
-                      </TableCell>
+                                Công khai
+                              </>
+                            )}
+                          </DropdownMenuItem>
+                          
+                          {post.image && (
+                            <DropdownMenuItem onClick={() => handleDownloadImage(post.image!, post.title)}>
+                              <Download className="h-4 w-4 mr-2" />
+                              Tải ảnh về
+                            </DropdownMenuItem>
+                          )}
+                          
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            onClick={() => setDeleteConfirm(post.id!)}
+                            className="text-red-600"
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Xóa
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </TableCell>
                     </TableRow>
                   ))
                 )}
@@ -548,6 +569,15 @@ export default function BlogManagement() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Preview Modal - Hiển thị tất cả bài viết */}
+      <PreviewModal
+        isOpen={showPreviewModal}
+        onClose={handleClosePreviewModal}
+        post={previewMode === 'single' ? previewPost : null}
+        allPosts={posts}
+        mode={previewMode}
+      />
     </div>
   )
 }

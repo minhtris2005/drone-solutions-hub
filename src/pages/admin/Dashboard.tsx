@@ -1,19 +1,24 @@
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/contexts/AuthContext"
-import { LogOut, FileText, BookOpen, MessageSquare, Users, TrendingUp, Calendar, Eye, Download } from "lucide-react"
+import { LogOut, BookOpen, TrendingUp, Calendar, Eye, Edit, FileText, Users, BarChart, Clock, EyeOff, Plus, ChevronRight } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useEffect, useState } from "react"
 import { supabase } from "@/services/supabase"
 import { BlogPost } from "@/types"
-import { Document } from "@/types"
-
+import { Badge } from "@/components/ui/badge"
+import { Progress } from "@/components/ui/progress"
+import { Separator } from "@/components/ui/separator"
+import { BlogForm } from "@/components/admin/BlogForm" // Thêm import BlogForm
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog" // Thêm import Dialog
 interface DashboardStats {
   totalPosts: number
-  totalDocuments: number
-  totalPublishedPosts: number
-  totalPublishedDocuments: number
-  totalUsers?: number
+  totalPublished: number
+  totalDrafts: number
+  totalViews: number
+  avgViews: number
+  topCategory: string
+  recentActivity: number
 }
 
 export default function Dashboard() {
@@ -21,14 +26,18 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState<DashboardStats>({
     totalPosts: 0,
-    totalDocuments: 0,
-    totalPublishedPosts: 0,
-    totalPublishedDocuments: 0,
-    totalUsers: 0
+    totalPublished: 0,
+    totalDrafts: 0,
+    totalViews: 0,
+    avgViews: 0,
+    topCategory: 'Chưa có',
+    recentActivity: 0
   })
   const [recentPosts, setRecentPosts] = useState<BlogPost[]>([])
-  const [recentDocuments, setRecentDocuments] = useState<Document[]>([])
-
+  const [popularPosts, setPopularPosts] = useState<BlogPost[]>([])
+  const [categories, setCategories] = useState<{name: string, count: number}[]>([])
+  const [showForm, setShowForm] = useState(false)
+  const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null)
   useEffect(() => {
     fetchDashboardData()
   }, [])
@@ -37,47 +46,61 @@ export default function Dashboard() {
     try {
       setLoading(true)
       
-      // Fetch all data in parallel
-      const [
-        postsData,
-        documentsData,
-        publishedPostsData,
-        publishedDocumentsData,
-        usersData
-      ] = await Promise.all([
-        supabase.from('blog_posts').select('*'),
-        supabase.from('documents').select('*'),
-        supabase.from('blog_posts').select('*').eq('status', 'published'),
-        supabase.from('documents').select('*').eq('status', 'published'),
-        supabase.auth.admin.listUsers() // Để lấy số lượng users
-      ])
-
-      // Fetch recent posts (last 3)
-      const { data: recentPostsData } = await supabase
+      // Fetch all posts
+      const { data: allPosts } = await supabase
         .from('blog_posts')
         .select('*')
         .order('created_at', { ascending: false })
-        .limit(3)
 
-      // Fetch recent documents (last 3)
-      const { data: recentDocumentsData } = await supabase
-        .from('documents')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(3)
+      // Calculate stats
+      const totalPosts = allPosts?.length || 0
+      const publishedPosts = allPosts?.filter(p => p.status === 'published') || []
+      const draftPosts = allPosts?.filter(p => p.status === 'draft') || []
+      const totalViews = publishedPosts.reduce((sum, post) => sum + (post.views || 0), 0)
+      const avgViews = publishedPosts.length > 0 ? Math.round(totalViews / publishedPosts.length) : 0
 
-      // Set stats
+      // Get category stats
+      const categoryMap = new Map<string, number>()
+      allPosts?.forEach(post => {
+        const count = categoryMap.get(post.category) || 0
+        categoryMap.set(post.category, count + 1)
+      })
+      
+      const categoryArray = Array.from(categoryMap.entries())
+        .map(([name, count]) => ({ name, count }))
+        .sort((a, b) => b.count - a.count)
+
+      // Get top category
+      const topCategory = categoryArray.length > 0 ? categoryArray[0].name : 'Chưa có'
+
+      // Get recent activity (posts created in last 7 days)
+      const weekAgo = new Date()
+      weekAgo.setDate(weekAgo.getDate() - 7)
+      const recentActivity = allPosts?.filter(post => 
+        new Date(post.created_at) > weekAgo
+      ).length || 0
+
+      // Get recent posts (last 5)
+      const recentPostsData = allPosts?.slice(0, 5) || []
+
+      // Get popular posts (by views)
+      const popularPostsData = publishedPosts
+        .sort((a, b) => (b.views || 0) - (a.views || 0))
+        .slice(0, 3)
+
       setStats({
-        totalPosts: postsData.data?.length || 0,
-        totalDocuments: documentsData.data?.length || 0,
-        totalPublishedPosts: publishedPostsData.data?.length || 0,
-        totalPublishedDocuments: publishedDocumentsData.data?.length || 0,
-        totalUsers: usersData.data?.users?.length || 0
+        totalPosts,
+        totalPublished: publishedPosts.length,
+        totalDrafts: draftPosts.length,
+        totalViews,
+        avgViews,
+        topCategory,
+        recentActivity
       })
 
-      // Set recent data
-      setRecentPosts(recentPostsData || [])
-      setRecentDocuments(recentDocumentsData || [])
+      setRecentPosts(recentPostsData)
+      setPopularPosts(popularPostsData)
+      setCategories(categoryArray)
 
     } catch (error) {
       console.error('Error fetching dashboard data:', error)
@@ -85,56 +108,39 @@ export default function Dashboard() {
       setLoading(false)
     }
   }
-
-  const calculateChange = (current: number, previous: number = current * 0.8) => {
-    if (previous === 0) return '+100%'
-    const change = ((current - previous) / previous) * 100
-    return `${change >= 0 ? '+' : ''}${Math.round(change)}%`
+    // Thêm vào trong component, sau các state
+    const handleFormSuccess = () => {
+      setShowForm(false)
+      fetchDashboardData() // Gọi lại để cập nhật thống kê
+    }
+  const formatNumber = (num: number) => {
+    if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`
+    if (num >= 1000) return `${(num / 1000).toFixed(1)}K`
+    return num.toString()
   }
 
-  const dashboardStats = [
-    { 
-      title: "Tổng bài viết", 
-      value: stats.totalPosts.toString(), 
-      icon: BookOpen, 
-      change: calculateChange(stats.totalPosts), 
-      color: "bg-blue-500",
-      description: `${stats.totalPublishedPosts} đã công khai`
-    },
-    { 
-      title: "Tài liệu", 
-      value: stats.totalDocuments.toString(), 
-      icon: FileText, 
-      change: calculateChange(stats.totalDocuments), 
-      color: "bg-green-500",
-      description: `${stats.totalPublishedDocuments} đã công khai`
-    },
-    { 
-      title: "FAQ Chatbot", 
-      value: "42", 
-      icon: MessageSquare, 
-      change: "+23%", 
-      color: "bg-purple-500",
-      description: "Câu hỏi thường gặp"
-    },
-    { 
-      title: "Người dùng", 
-      value: stats.totalUsers?.toString() || "0", 
-      icon: Users, 
-      change: calculateChange(stats.totalUsers || 0), 
-      color: "bg-orange-500",
-      description: "Tài khoản hệ thống"
-    },
-  ]
+  const getTimeAgo = (dateString: string) => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
+    
+    if (diffInHours < 24) {
+      return `${diffInHours} giờ trước`
+    } else {
+      const diffInDays = Math.floor(diffInHours / 24)
+      return `${diffInDays} ngày trước`
+    }
+  }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-center items-center h-96">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-              <p className="mt-4 text-gray-600">Đang tải dữ liệu...</p>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-gray-600 font-medium">Đang tải dữ liệu...</p>
+              <p className="text-sm text-gray-500 mt-2">Vui lòng đợi trong giây lát</p>
             </div>
           </div>
         </div>
@@ -143,259 +149,331 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-            <p className="text-gray-600 mt-1">
-              Xin chào, <span className="font-semibold text-blue-600">{user?.email}</span> • Chào mừng trở lại!
-            </p>
-            <p className="text-sm text-gray-500 mt-1">
-              Cập nhật lúc: {new Date().toLocaleString('vi-VN')}
+            <h1 className="text-3xl font-bold text-gray-900 bg-gradient-to-r from-vibrant-red to-pure-black bg-clip-text text-transparent">
+              Dashboard Quản lý Blog
+            </h1>
+            <div className="flex items-center gap-3 mt-2">
+              <p className="text-warm-gray">
+                Xin chào, <span className="font-semibold text-pure-black">{user?.email}</span>
+              </p>
+              <span className="text-xs px-2 py-1 bg-pure-black text-pure-white rounded-full">
+                Quản trị viên
+              </span>
+            </div>
+            <p className="text-sm text-warm-gray mt-1">
+              Cập nhật lúc: {new Date().toLocaleString('vi-VN', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              })}
             </p>
           </div>
-          <Button onClick={logout} variant="outline" className="gap-2">
-            <LogOut className="h-4 w-4" />
-            Đăng xuất
+          <div className="flex gap-3">
+            <Button 
+            onClick={() => {
+              setSelectedPost(null)
+              setShowForm(true)
+            }} 
+            className="mr-2 gap-2 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 shadow-md"
+          >
+            <Plus className="w-4 h-4" />
+            Tạo bài viết mới
           </Button>
+            <Button onClick={logout} variant="outline" className="gap-2 border-gray-300">
+              <LogOut className="h-4 w-4" />
+              Đăng xuất
+            </Button>
+          </div>
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {dashboardStats.map((stat, index) => (
-            <Card key={index}>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600">
-                  {stat.title}
-                </CardTitle>
-                <div className={`p-2 rounded-lg ${stat.color}`}>
-                  <stat.icon className="h-4 w-4 text-white" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 bg-red-100 rounded-xl">
+                  <BookOpen className="h-6 w-6 text-red-600" />
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stat.value}</div>
-                <p className="text-sm text-gray-500 mt-1">{stat.description}</p>
-                <div className="flex items-center mt-2">
-                  <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
-                  <span className="text-sm text-green-600">{stat.change} so với tháng trước</span>
+                <span className="text-sm font-medium text-red-600 bg-red-50 px-3 py-1 rounded-full">
+                  {((stats.totalPublished / stats.totalPosts) * 100 || 0).toFixed(0)}% hoàn thành
+                </span>
+              </div>
+              <h3 className="text-3xl font-bold text-gray-900 mb-1">{stats.totalPosts}</h3>
+              <p className="text-gray-600 font-medium">Tổng bài viết</p>
+              <div className="mt-4">
+                <div className="flex justify-between text-sm text-gray-500 mb-1">
+                  <span>Đã công khai: {stats.totalPublished}</span>
+                  <span>Bản nháp: {stats.totalDrafts}</span>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
+                <Progress value={(stats.totalPublished / stats.totalPosts) * 100 || 0} className="h-2" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 bg-red-100 rounded-xl">
+                  <Eye className="h-6 w-6 text-red-600" />
+                </div>
+                <TrendingUp className="h-5 w-5 text-red-500" />
+              </div>
+              <h3 className="text-3xl font-bold text-gray-900 mb-1">{formatNumber(stats.totalViews)}</h3>
+              <p className="text-gray-600 font-medium">Tổng lượt xem</p>
+              <div className="mt-4 flex items-center gap-2 text-sm text-gray-500">
+                <Clock className="h-4 w-4" />
+                <span>Trung bình: {stats.avgViews} lượt/bài</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 bg-red-100 rounded-xl">
+                  <BarChart className="h-6 w-6 text-red-600" />
+                </div>
+                <Badge variant="outline" className="bg-purple-50 text-red-700 border-purple-200">
+                  {categories.length} danh mục
+                </Badge>
+              </div>
+              <h3 className="text-3xl font-bold text-gray-900 mb-1">{stats.topCategory}</h3>
+              <p className="text-gray-600 font-medium">Danh mục phổ biến</p>
+              <div className="mt-4">
+                <p className="text-sm text-gray-500">
+                  {categories.length > 0 ? (
+                    `${categories[0].count} bài viết`
+                  ) : (
+                    "Chưa có bài viết"
+                  )}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 bg-orange-100 rounded-xl">
+                  <Clock className="h-6 w-6 text-red-600" />
+                </div>
+                <span className={`text-sm font-medium px-3 py-1 rounded-full ${
+                  stats.recentActivity > 0 
+                    ? 'bg-red-100 text-red-700' 
+                    : 'bg-red-100 text-red-700'
+                }`}>
+                  {stats.recentActivity > 0 ? 'Đang hoạt động' : 'Không có hoạt động'}
+                </span>
+              </div>
+              <h3 className="text-3xl font-bold text-gray-900 mb-1">{stats.recentActivity}</h3>
+              <p className="text-gray-600 font-medium">Hoạt động 7 ngày</p>
+              <div className="mt-4">
+                <p className="text-sm text-gray-500">
+                  {stats.recentActivity > 0 
+                    ? `Có ${stats.recentActivity} bài viết mới` 
+                    : 'Chưa có bài viết mới'}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          {/* Recent Blog Posts */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BookOpen className="h-5 w-5" />
-                Bài viết gần đây
-              </CardTitle>
-              <CardDescription>
-                {recentPosts.length} bài viết mới nhất
-              </CardDescription>
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          {/* Recent Posts */}
+          <Card className="lg:col-span-2 border border-gray-200 shadow-sm">
+            <CardHeader className="border-b border-gray-100">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2 text-xl">
+                    <BookOpen className="h-5 w-5 text-red-600" />
+                    Bài viết gần đây
+                  </CardTitle>
+                  <CardDescription>
+                    {recentPosts.length} bài viết mới nhất được cập nhật
+                  </CardDescription>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="gap-2 text-vibrant-red hover:text-red-700 hover:bg-red-50"
+                  onClick={() => window.location.href = '/admin/blog'}
+                >
+                  Xem tất cả
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-0">
               {recentPosts.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  <BookOpen className="h-12 w-12 mx-auto text-gray-300 mb-3" />
-                  <p>Chưa có bài viết nào</p>
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+                    <BookOpen className="h-8 w-8 text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-700 mb-2">Chưa có bài viết nào</h3>
+                  <p className="text-gray-500 mb-6">Hãy tạo bài viết đầu tiên của bạn</p>
+                  <Button 
+                    onClick={() => window.location.href = '/admin/blog/new'} 
+                    className="gap-2"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Tạo bài viết mới
+                  </Button>
                 </div>
               ) : (
-                <>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Bài viết</TableHead>
-                        <TableHead>Trạng thái</TableHead>
-                        <TableHead>Ngày</TableHead>
-                        <TableHead className="text-right">Thao tác</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {recentPosts.map((post) => (
-                        <TableRow key={post.id} className="hover:bg-gray-50">
-                          <TableCell className="font-medium truncate max-w-[200px]">
-                            {post.title}
-                          </TableCell>
-                          <TableCell>
-                            <span className={`px-2 py-1 text-xs rounded-full ${
-                              post.status === 'published' 
-                                ? 'bg-green-100 text-green-800' 
-                                : 'bg-gray-100 text-gray-800'
-                            }`}>
+                <div className="divide-y divide-gray-100">
+                  {recentPosts.map((post, index) => (
+                    <div key={post.id} className="p-4 hover:bg-gray-50 transition-colors duration-150">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-3 mb-2">
+                            <h4 className="font-medium text-gray-900 truncate">{post.title}</h4>
+                            <span 
+                              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold pointer-events-none ${post.status === 'published' ? 'bg-red-600 text-white' : 'bg-red-400 text-white'}`}
+                            >
                               {post.status === 'published' ? 'Công khai' : 'Nháp'}
                             </span>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-1">
+                          </div>
+                          <div className="flex items-center gap-4 text-sm text-gray-500">
+                            <span className="flex items-center gap-1">
                               <Calendar className="h-3 w-3" />
-                              {post.date || 'N/A'}
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => window.open(`/blog/${post.id}`, '_blank')}
-                            >
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                  <div className="mt-4">
-                    <Button variant="outline" className="w-full" onClick={() => window.location.href = '/admin/blog'}>
-                      Xem tất cả bài viết ({stats.totalPosts})
-                    </Button>
-                  </div>
-                </>
+                              {post.date || new Date(post.created_at).toLocaleDateString('vi-VN')}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Eye className="h-3 w-3" />
+                              {post.views || 0} lượt xem
+                            </span>
+                            <span className="px-2 py-0.5 bg-gray-100 rounded text-xs">
+                              {post.category}
+                            </span>
+                            <span className="text-xs text-gray-400">
+                              {getTimeAgo(post.created_at)}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               )}
             </CardContent>
           </Card>
 
-          {/* Recent Documents */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5" />
-                Tài liệu mới
-              </CardTitle>
-              <CardDescription>
-                {recentDocuments.length} tài liệu mới nhất
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {recentDocuments.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  <FileText className="h-12 w-12 mx-auto text-gray-300 mb-3" />
-                  <p>Chưa có tài liệu nào</p>
-                </div>
-              ) : (
-                <>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Tài liệu</TableHead>
-                        <TableHead>Loại</TableHead>
-                        <TableHead>Trạng thái</TableHead>
-                        <TableHead className="text-right">Thao tác</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                    {recentDocuments.map((doc) => (
-                      <TableRow key={doc.id} className="hover:bg-gray-50">
-                        <TableCell className="font-medium truncate max-w-[200px]">
-                          {doc.title || doc.file_name}
-                        </TableCell>
-                        <TableCell>
-                          <span className="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800 truncate max-w-[80px] inline-block">
-                            {doc.file_type || 'FILE'}
-                          </span>
-                        </TableCell>
-                        <TableCell className="min-w-[100px]"> {/* Thêm class này */}
-                          <span className={`px-2 py-1 text-xs rounded-full ${
-                            doc.status === 'published' 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-gray-100 text-gray-800'
-                          } whitespace-nowrap inline-block`}> {/* Thêm whitespace-nowrap và inline-block */}
-                            {doc.status === 'published' ? 'Công khai' : 'Nháp'}
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          {doc.file_url && (
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => window.open(doc.file_url, '_blank')}
-                            >
-                              <Download className="h-4 w-4" />
-                            </Button>
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                  </Table>
-                  <div className="mt-4">
-                    <Button variant="outline" className="w-full" onClick={() => window.location.href = '/admin/documents'}>
-                      Xem tất cả tài liệu ({stats.totalDocuments})
-                    </Button>
+          {/* Popular Posts & Categories */}
+          <div className="space-y-6">
+            {/* Popular Posts */}
+            <Card className="border border-gray-200 shadow-sm">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5 text-vibrant-red" />
+                  Bài viết phổ biến
+                </CardTitle>
+                <CardDescription>
+                  Top {popularPosts.length} bài viết được xem nhiều nhất
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {popularPosts.length === 0 ? (
+                  <div className="text-center py-8">
+                    <TrendingUp className="h-12 w-12 mx-auto text-gray-300 mb-3" />
+                    <p className="text-gray-500">Chưa có lượt xem nào</p>
                   </div>
-                </>
-              )}
-            </CardContent>
-          </Card>
+                ) : (
+                  <div className="space-y-4">
+                    {popularPosts.map((post, index) => (
+                      <div key={post.id} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
+                          <span className="font-bold text-red-600 text-sm">{index + 1}</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-gray-900 truncate">{post.title}</p>
+                          <div className="flex items-center gap-2 text-sm text-gray-500">
+                            <span className="flex items-center gap-1">
+                              <Eye className="h-3 w-3" />
+                              {post.views?.toLocaleString() || 0}
+                            </span>
+                            <span>•</span>
+                            <span>{post.category}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Categories */}
+            <Card className="border border-gray-200 shadow-sm">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-vibrant-red" />
+                  Phân loại danh mục
+                </CardTitle>
+                <CardDescription>
+                  {categories.length} danh mục bài viết
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {categories.length === 0 ? (
+                  <div className="text-center py-8">
+                    <FileText className="h-12 w-12 mx-auto text-gray-300 mb-3" />
+                    <p className="text-gray-500">Chưa có danh mục nào</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {categories.map((category, index) => {
+                      const percentage = (category.count / stats.totalPosts) * 100
+                      return (
+                        <div key={index} className="space-y-2">
+                          <div className="flex justify-between items-center">
+                            <span className="font-medium text-gray-700">{category.name}</span>
+                            <span className="text-sm font-semibold text-gray-900">{category.count} bài</span>
+                          </div>
+                          <Progress value={percentage} className="h-2" />
+                          <div className="flex justify-between text-xs text-gray-500">
+                            <span>{percentage.toFixed(1)}%</span>
+                            <span>{category.count} / {stats.totalPosts} bài viết</span>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
-        {/* Quick Actions */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Thao tác nhanh</CardTitle>
-            <CardDescription>
-              Truy cập nhanh vào các tính năng quản lý
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <a href="/admin/blog" className="group">
-                <div className="border border-gray-200 rounded-lg p-6 hover:border-blue-500 hover:bg-blue-50 transition-all duration-200">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="p-3 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors">
-                      <BookOpen className="h-6 w-6 text-blue-600" />
-                    </div>
-                    <div className="text-2xl font-bold text-blue-600">
-                      {stats.totalPosts}
-                    </div>
-                  </div>
-                  <h3 className="font-semibold text-lg mb-2">Quản lý Blog</h3>
-                  <p className="text-gray-600 text-sm">
-                    {stats.totalPublishedPosts} bài đã công khai
-                  </p>
-                </div>
-              </a>
-
-              <a href="/admin/documents" className="group">
-                <div className="border border-gray-200 rounded-lg p-6 hover:border-green-500 hover:bg-green-50 transition-all duration-200">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="p-3 bg-green-100 rounded-lg group-hover:bg-green-200 transition-colors">
-                      <FileText className="h-6 w-6 text-green-600" />
-                    </div>
-                    <div className="text-2xl font-bold text-green-600">
-                      {stats.totalDocuments}
-                    </div>
-                  </div>
-                  <h3 className="font-semibold text-lg mb-2">Quản lý Tài liệu</h3>
-                  <p className="text-gray-600 text-sm">
-                    {stats.totalPublishedDocuments} tài liệu đã công khai
-                  </p>
-                </div>
-              </a>
-
-              <a href="/admin/chatbot" className="group">
-                <div className="border border-gray-200 rounded-lg p-6 hover:border-purple-500 hover:bg-purple-50 transition-all duration-200">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="p-3 bg-purple-100 rounded-lg group-hover:bg-purple-200 transition-colors">
-                      <MessageSquare className="h-6 w-6 text-purple-600" />
-                    </div>
-                    <div className="text-2xl font-bold text-purple-600">
-                      42
-                    </div>
-                  </div>
-                  <h3 className="font-semibold text-lg mb-2">Quản lý Chatbot</h3>
-                  <p className="text-gray-600 text-sm">Quản lý câu hỏi thường gặp</p>
-                </div>
-              </a>
-            </div>
-          </CardContent>
-        </Card>
       </div>
+      {/* Thêm Dialog form cho tạo bài viết */}
+<Dialog open={showForm} onOpenChange={setShowForm}>
+  <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+    <DialogHeader>
+      <DialogTitle>
+        {selectedPost ? 'Chỉnh sửa bài viết' : 'Bài viết mới'}
+      </DialogTitle>
+      <DialogDescription>
+        {selectedPost ? 'Cập nhật nội dung bài viết' : 'Tạo bài viết mới cho blog'}
+      </DialogDescription>
+    </DialogHeader>
+    <BlogForm
+      post={selectedPost}
+      onSuccess={() => {
+        setShowForm(false)
+        fetchDashboardData() // Reload data after success
+      }}
+    />
+  </DialogContent>
+</Dialog>
     </div>
   )
 }

@@ -28,8 +28,8 @@ serve(async (req) => {
 
     // 1. SETUP SENDGRID
     const SENDGRID_API_KEY = Deno.env.get('SENDGRID_API_KEY')
-    const FROM_EMAIL = Deno.env.get('FROM_EMAIL') || 'noreply@test.com'
-    const ADMIN_EMAIL = Deno.env.get('ADMIN_EMAIL') || 'pnmt24092005@gmail.com'
+    const FROM_EMAIL = 'no-reply@em1368.vibecoding.hitek.com.vn'
+    const ADMIN_EMAIL = Deno.env.get('ADMIN_EMAIL') || 'phamnguyenminhtri249@gmail.com'
     
     console.log('🔑 SendGrid API Key exists:', !!SENDGRID_API_KEY)
     console.log('📧 From email:', FROM_EMAIL)
@@ -44,7 +44,10 @@ serve(async (req) => {
     // 2. EMAIL CHO ADMIN (bạn)
     const adminEmail = {
       to: ADMIN_EMAIL,
-      from: FROM_EMAIL,
+      from: {
+        email: FROM_EMAIL,
+        name: 'Hitek Flycam Website' // Thêm tên sender
+      },
       subject: `📧 Hitek Flycam - Liên hệ mới từ ${name}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -133,7 +136,10 @@ Thời gian: ${new Date().toLocaleString('vi-VN')}
     // 3. EMAIL AUTO-REPLY (cho khách hàng)
     const userEmail = {
       to: email,
-      from: FROM_EMAIL,
+      from: {
+        email: FROM_EMAIL,
+        name: 'Hitek Flycam'
+      },
       subject: 'Hitek Flycam - Cảm ơn bạn đã liên hệ',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -224,26 +230,27 @@ ID: ${Date.now()}
     }
 
     // 4. GỬI EMAILS
-    console.log('📤 Starting to send emails...')
+    console.log('📤 Starting to send emails with domain:', FROM_EMAIL)
     
     // Gửi email cho admin
-    console.log('📧 Sending admin email to:', ADMIN_EMAIL)
+    console.log('📧 Sending admin email from:', FROM_EMAIL, 'to:', ADMIN_EMAIL)
     const adminResult = await sgMail.send(adminEmail)
     console.log('✅ Admin email sent:', adminResult[0].statusCode === 202)
     
     // Gửi auto-reply cho khách hàng
-    console.log('📧 Sending auto-reply to:', email)
+    console.log('📧 Sending auto-reply from:', FROM_EMAIL, 'to:', email)
     const userResult = await sgMail.send(userEmail)
     console.log('✅ Auto-reply sent:', userResult[0].statusCode === 202)
     
-    console.log('🎉 All emails sent successfully!')
+    console.log('🎉 All emails sent successfully from domain!')
 
     return new Response(
       JSON.stringify({ 
         success: true, 
         message: 'Emails sent successfully!',
         adminEmail: ADMIN_EMAIL,
-        customerEmail: email
+        customerEmail: email,
+        fromDomain: FROM_EMAIL
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

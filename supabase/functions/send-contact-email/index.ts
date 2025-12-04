@@ -41,7 +41,7 @@ serve(async (req) => {
     
     sgMail.setApiKey(SENDGRID_API_KEY)
 
-    // 2. EMAIL CHO ADMIN (bạn)
+    // 2. Form hiển thị mail được gửi tới admin
     const adminEmail = {
       to: ADMIN_EMAIL,
       from: {
@@ -133,7 +133,7 @@ Thời gian: ${new Date().toLocaleString('vi-VN')}
 `
     }
 
-    // 3. EMAIL AUTO-REPLY (cho khách hàng)
+    // 3. Form hiển thị mail được gửi tới khách hàng
     const userEmail = {
       to: email,
       from: {
@@ -178,9 +178,9 @@ Thời gian: ${new Date().toLocaleString('vi-VN')}
               <h4 style="color: #0369a1; margin-top: 0;">📞 Cần hỗ trợ ngay?</h4>
               <p style="color: #0c4a6e; margin-bottom: 10px;">Liên hệ trực tiếp với chúng tôi:</p>
               <ul style="color: #0c4a6e; padding-left: 20px; margin: 0;">
-                <li>Hotline: <strong>028 99 95 95 88</strong></li>
-                <li>Email: <strong>info@droneservices.vn</strong></li>
-                <li>Thời gian làm việc: Thứ 2 - Thứ 6: 8:00 - 18:00</li>
+                <li>Hotline: <strong>(+84) 28 99 95 95 88</strong></li>
+                <li>Email: <strong>contact@hitek.com.vn</strong></li>
+                <li>Thời gian làm việc: Thứ 2 - Thứ 6: 9:00 - 18:00</li>
               </ul>
             </div>
             
@@ -189,7 +189,7 @@ Thời gian: ${new Date().toLocaleString('vi-VN')}
             
             <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e5e7eb; text-align: center; color: #6b7280; font-size: 12px;">
               <p><strong>Hitek Flycam - Giải pháp Drone chuyên nghiệp</strong></p>
-              <p>📍 Quận 1, Tp. Hồ Chí Minh | 📞 028 99 95 95 88 | 🌐 droneservices.vn</p>
+              <p>📍 Quận Tân Bình, Tp. Hồ Chí Minh | 📞 (+84) 28 99 95 95 88 | 🌐 hitekflycam.com.vn</p>
               <p style="margin-top: 10px; color: #9ca3af;">
                 Email này được gửi tự động, vui lòng không trả lời trực tiếp.<br>
                 ID liên hệ: ${Date.now()}

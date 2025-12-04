@@ -624,84 +624,84 @@ export default function Blog() {
                     const isUpdating = updatingIds.has(post.id);
                     
                     return (
-                      <Card 
-                        key={post.id} 
-                        className="group overflow-hidden border border-gray-200 dark:border-gray-700 hover:border-primary/30 hover:shadow-xl transition-all duration-300 flex flex-col h-full min-w-[300px] md:min-w-[350px] lg:min-w-[400px] flex-shrink-0"
-                      >
-                        <div className="relative h-48 overflow-hidden">
-                          <img
-                            src={postImage}
-                            alt={post.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                            loading="lazy"
-                          />
-                          <Badge 
-                            variant="secondary" 
-                            className="absolute top-3 left-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm"
-                          >
-                            {post.category}
-                          </Badge>
-                        </div>
+                    <Card 
+                      key={post.id} 
+                      className="group overflow-hidden border border-gray-200 dark:border-gray-700 hover:border-primary/30 hover:shadow-xl transition-all duration-300 flex flex-col h-full w-full md:w-[398px] flex-shrink-0"
+                    >
+                      <div className="relative">
+                        <img
+                          src={postImage}
+                          alt={post.title}
+                          className="w-[398px] h-[192px] object-cover group-hover:scale-105 transition-transform duration-500"
+                          loading="lazy"
+                        />
+                        <Badge 
+                          variant="secondary" 
+                          className="absolute top-3 left-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm"
+                        >
+                          {post.category}
+                        </Badge>
+                      </div>
 
-                        <CardContent className="p-6 flex flex-col flex-grow">
-                          <h3 
-                            onClick={(e) => handlePostClick(e, post.id)}
-                            className="text-xl font-bold mb-3 text-foreground group-hover:text-primary transition-colors line-clamp-2 cursor-pointer"
-                          >
-                            {post.title}
-                          </h3>
+                      <CardContent className="p-6 flex flex-col flex-grow">
+                        <h3 
+                          onClick={(e) => handlePostClick(e, post.id)}
+                          className="text-xl font-bold mb-3 text-foreground group-hover:text-primary transition-colors line-clamp-2 cursor-pointer"
+                        >
+                          {post.title}
+                        </h3>
 
-                          <p className="text-muted-foreground mb-4 line-clamp-3 flex-grow">
-                            {post.excerpt || post.content?.substring(0, 150) + "..."}
-                          </p>
+                        <p className="text-muted-foreground mb-4 line-clamp-3 flex-grow">
+                          {post.excerpt || post.content?.substring(0, 150) + "..."}
+                        </p>
 
-                          <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                            <div className="flex items-center gap-3">
-                              <span className="flex items-center gap-1">
-                                <Calendar className="w-3 h-3" />
-                                {post.date || new Date(post.created_at || '').toLocaleDateString('vi-VN')}
-                              </span>
-                              <span className="flex items-center gap-1">
-                                <Clock className="w-3 h-3" />
-                                {post.readTime}
-                              </span>
-                            </div>
-                            
-                            <span className={`flex items-center gap-1 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full transition-all ${isUpdating ? 'bg-primary/10' : ''}`}>
-                              <Eye className={`w-3 h-3 ${isUpdating ? 'animate-pulse' : ''}`} />
-                              <span className="font-medium">
-                                {isUpdating ? '...' : post.views.toLocaleString()}
-                              </span>
+                        <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                          <div className="flex items-center gap-3">
+                            <span className="flex items-center gap-1">
+                              <Calendar className="w-3 h-3" />
+                              {post.date || new Date(post.created_at || '').toLocaleDateString('vi-VN')}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Clock className="w-3 h-3" />
+                              {post.readTime}
                             </span>
                           </div>
+                          
+                          <span className={`flex items-center gap-1 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full transition-all ${isUpdating ? 'bg-primary/10' : ''}`}>
+                            <Eye className={`w-3 h-3 ${isUpdating ? 'animate-pulse' : ''}`} />
+                            <span className="font-medium">
+                              {isUpdating ? '...' : post.views.toLocaleString()}
+                            </span>
+                          </span>
+                        </div>
 
-                          <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-100 dark:border-gray-700">
-                            <div className="flex items-center text-sm">
-                              <User className="w-4 h-4 mr-2 text-gray-400" />
-                              <span className="text-gray-600 dark:text-gray-400">{post.author}</span>
-                            </div>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={(e) => handleReadMoreClick(e, post.id)}
-                              disabled={isUpdating}
-                              className="text-primary hover:text-primary/80 hover:bg-primary/5"
-                            >
-                              {isUpdating ? (
-                                <span className="flex items-center">
-                                  <span className="animate-spin mr-2 h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />
-                                  Đang xử lý...
-                                </span>
-                              ) : (
-                                <span className="flex items-center">
-                                  Đọc thêm
-                                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                                </span>
-                              )}
-                            </Button>
+                        <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-100 dark:border-gray-700">
+                          <div className="flex items-center text-sm">
+                            <User className="w-4 h-4 mr-2 text-gray-400" />
+                            <span className="text-gray-600 dark:text-gray-400">{post.author}</span>
                           </div>
-                        </CardContent>
-                      </Card>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => handleReadMoreClick(e, post.id)}
+                            disabled={isUpdating}
+                            className="text-primary hover:text-primary/80 hover:bg-primary/5"
+                          >
+                            {isUpdating ? (
+                              <span className="flex items-center">
+                                <span className="animate-spin mr-2 h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />
+                                Đang xử lý...
+                              </span>
+                            ) : (
+                              <span className="flex items-center">
+                                Đọc thêm
+                                <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                              </span>
+                            )}
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
                     );
                   })}
                 </div>

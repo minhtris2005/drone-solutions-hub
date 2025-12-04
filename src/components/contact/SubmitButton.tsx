@@ -3,16 +3,16 @@ import { Button } from "@/components/ui/button";
 
 interface SubmitButtonProps {
   isLoading: boolean;
-  className?: string;
+  isValid: boolean;
 }
 
-const SubmitButton = ({ isLoading, className = "" }: SubmitButtonProps) => {
+const SubmitButton = ({ isLoading, isValid }: SubmitButtonProps) => {
   return (
     <Button 
       type="submit" 
-      className={`w-full ${className}`} 
+      className="w-full" 
       size="lg"
-      disabled={isLoading}
+      disabled={isLoading || !isValid}
     >
       {isLoading ? (
         <>

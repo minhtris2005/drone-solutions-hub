@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight, Target, Rocket, Users, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import BgAbout from "@/assets/home/bg.png";
+import BgAbout from "@/assets/about_us/hero.png";
 import LgFlycam from "@/assets/logo/logo-flycam-hitek.png";
 
 export default function HeroSection() {
@@ -52,8 +52,8 @@ export default function HeroSection() {
         />
         
         {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-background/95 via-primary/15 to-background/95" />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/90" />
+        <div className="absolute inset-0 bg-gradient-to-br from-background/5 via-primary/5 to-background/5" />
+        {/* <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/90" /> */}
       </div>
 
       {/* Floating Elements */}
@@ -119,7 +119,7 @@ export default function HeroSection() {
                 />
               </div>
               <div>
-                <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 leading-tight">
+                <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-pure-white mb-6 leading-tight">
                   VỀ{" "}
                   <motion.span 
                     className="text-primary"
@@ -141,7 +141,7 @@ export default function HeroSection() {
                 </h1>
                 <div className="w-24 h-1 bg-gradient-to-r from-primary to-red-400 mx-auto rounded-full mb-6"></div>
                 <motion.p 
-                  className="text-xl md:text-2xl text-muted-foreground font-medium max-w-3xl mx-auto"
+                  className="text-xl md:text-2xl text-pure-white font-medium max-w-3xl mx-auto"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.8, duration: 1 }}

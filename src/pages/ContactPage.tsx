@@ -10,7 +10,7 @@ export const metadata = {
 export default function ContactPage() {
   return (
     <div className="min-h-screen bg-background">
-      <section className="pt-32 pb-20">
+      <section className="pt-24 pb-20">
         <div className="container mx-auto px-4">
           {/* Hero Section */}
           <ContactHero />

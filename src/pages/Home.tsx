@@ -4,6 +4,9 @@ import Features from "@/components/home/Features";
 import ServicesPreview from "@/components/home/ServicesPreview";
 import CTA from "@/components/home/CTA";
 import Hero from "@/components/home/Hero";
+import ClientSection from "@/components/home/ClientsSection"
+import AboutSection from "@/components/home/AboutSection"
+
 
 export default function Home() {
   return (
@@ -12,6 +15,8 @@ export default function Home() {
       <TopLolution />
       <Features />
       <ServicesPreview />
+      <ClientSection />
+      <AboutSection />
       <CTA />
     </div>
   );

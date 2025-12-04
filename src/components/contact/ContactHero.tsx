@@ -37,14 +37,21 @@ const ContactHero = () => {
         variants={itemVariants}
         className="text-4xl md:text-5xl font-bold text-foreground mb-6"
       >
-        Liên hệ với chúng tôi
+        Liên hệ với{" "}
+        <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-red-500">
+          Hitek Flycam
+        </span>
       </motion.h1>
       
       <motion.p 
         variants={itemVariants}
         className="text-lg md:text-xl text-muted-foreground"
       >
-        Hãy để chúng tôi giúp bạn với dự án drone của bạn. Chúng tôi luôn sẵn sàng hỗ trợ 24/7.
+        Chúng tôi luôn sẵn sàng trao đổi về mọi dự án của bạn.
+        <br />
+        Liên hệ ngay với{" "}
+        <span className="font-semibold text-primary">Hitek Flycam</span>{" "}
+        để được tư vấn chi tiết.
       </motion.p>
 
       {/* Decorative elements */}

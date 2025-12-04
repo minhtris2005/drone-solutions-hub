@@ -244,11 +244,8 @@ export default function TrustedClientsSection() {
                       {/* <p className="text-center text-xs md:text-sm text-primary dark:text-red-400 mb-2 px-2 md:px-3 py-1 bg-primary/5 dark:bg-red-400/5 rounded-full inline-block mx-auto block w-fit line-clamp-1">
                         {client.project}
                       </p> */}
-                      
                       {/* Hover Indicator */}
-
                     </div>
-                    
                     {/* Card Glow */}
                     <div className="absolute inset-0 -z-10 rounded-2xl bg-gradient-to-br from-primary/5 to-transparent opacity-0 blur-xl transition-opacity duration-500" />
                   </motion.div>

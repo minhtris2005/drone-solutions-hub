@@ -32,15 +32,28 @@ const ContactForm = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [successMessage, setSuccessMessage] = useState('');
   const timeoutsRef = useRef<Record<string, NodeJS.Timeout>>({});
 
+  // Reset success message sau 10 giây
+  useEffect(() => {
+    if (submitStatus === 'success') {
+      const timer = setTimeout(() => {
+        setSubmitStatus('idle');
+        setSuccessMessage('');
+      }, 10000); // 10 giây
+    
+      return () => clearTimeout(timer);
+    }
+  }, [submitStatus]);
+
   // Validation functions
-  const validateName = (name: string) => {
-    if (!name.trim()) return 'Họ tên là bắt buộc';
-    if (name.length < 3) return 'Họ tên phải có ít nhất 3 ký tự';
-    if (!/^[A-Za-zÀ-ỹ\s]+$/.test(name)) return 'Họ tên chỉ được chứa chữ cái và khoảng trắng';
-    return '';
-  };
+const validateName = (name: string) => {
+  if (!name.trim()) return 'Họ tên là bắt buộc';
+  if (name.length < 3) return 'Họ tên phải có ít nhất 3 ký tự';
+  // KHÔNG kiểm tra regex - cho phép tất cả ký tự
+  return '';
+};
 
   const validateCompany = (company: string) => {
     if (company && company.length < 3) return 'Tên công ty phải có ít nhất 3 ký tự';
@@ -132,44 +145,40 @@ const ContactForm = () => {
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
+  const { name, value } = e.target;
+  
+  let newValue = value;
+  
+  // Xử lý tự động format số điện thoại
+  if (name === 'phone') {
+    // Loại bỏ tất cả ký tự không phải số
+    const numbers = value.replace(/\D/g, '');
     
-    let newValue = value;
-    
-    // Xử lý chỉ cho phép nhập chữ cái cho trường name
-    if (name === 'name') {
-      newValue = value.replace(/[^A-Za-zÀ-ỹ\s]/g, '');
+    // Nếu bắt đầu bằng 84, giữ nguyên 84
+    if (numbers.startsWith('84')) {
+      newValue = numbers;
+    } 
+    // Nếu bắt đầu bằng 0, giữ nguyên 0
+    else if (numbers.startsWith('0')) {
+      newValue = numbers;
     }
-    
-    // Xử lý tự động format số điện thoại
-    if (name === 'phone') {
-      // Loại bỏ tất cả ký tự không phải số
-      const numbers = value.replace(/\D/g, '');
-      
-      // Nếu bắt đầu bằng 84, giữ nguyên 84
-      if (numbers.startsWith('84')) {
-        newValue = numbers;
-      } 
-      // Nếu bắt đầu bằng 0, giữ nguyên 0
-      else if (numbers.startsWith('0')) {
-        newValue = numbers;
-      }
-      // Nếu không bắt đầu bằng gì cả nhưng có số
-      else if (numbers) {
-        newValue = '0' + numbers;
-      } else {
-        newValue = '';
-      }
+    // Nếu không bắt đầu bằng gì cả nhưng có số
+    else if (numbers) {
+      newValue = '0' + numbers;
+    } else {
+      newValue = '';
     }
-    
-    setFormData(prev => ({
-      ...prev,
-      [name]: newValue
-    }));
+  }
+  
+  // Các trường khác giữ nguyên
+  setFormData(prev => ({
+    ...prev,
+    [name]: newValue
+  }));
 
-    // Debounced validation
-    debouncedValidate(name, newValue);
-  };
+  // Debounced validation
+  debouncedValidate(name, newValue);
+};
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -218,6 +227,7 @@ const ContactForm = () => {
 
     setIsLoading(true);
     setSubmitStatus('loading');
+    setSuccessMessage('');
 
     try {
       console.log('🔄 Submitting form...');
@@ -227,6 +237,8 @@ const ContactForm = () => {
       
       if (result.success) {
         setSubmitStatus('success');
+        setSuccessMessage('✅ Gửi thành công! Chúng tôi sẽ liên hệ lại sớm và đã gửi email xác nhận cho bạn.');
+        
         // Reset form
         setFormData({ 
           name: '', 
@@ -249,10 +261,12 @@ const ContactForm = () => {
         });
       } else {
         setSubmitStatus('error');
+        setSuccessMessage('❌ Có lỗi xảy ra khi gửi form. Vui lòng thử lại sau.');
       }
     } catch (error) {
       console.error('❌ Form submit error:', error);
       setSubmitStatus('error');
+      setSuccessMessage('❌ Có lỗi xảy ra khi gửi form. Vui lòng thử lại sau.');
     } finally {
       setIsLoading(false);
     }
@@ -274,6 +288,75 @@ const ContactForm = () => {
             onValidateField={validateField}
           />
 
+          {/* Thông báo thành công */}
+          {submitStatus === 'success' && successMessage && (
+            <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm font-medium text-green-800">{successMessage}</p>
+                  <p className="mt-1 text-sm text-green-600 opacity-75">
+                    Email xác nhận đã được gửi tới {formData.email || 'email của bạn'}
+                  </p>
+                </div>
+                <div className="ml-auto pl-3">
+                  <div className="-mx-1.5 -my-1.5">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSubmitStatus('idle');
+                        setSuccessMessage('');
+                      }}
+                      className="inline-flex rounded-md p-1.5 text-green-500 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-600"
+                    >
+                      <span className="sr-only">Đóng</span>
+                      <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Thông báo lỗi */}
+          {submitStatus === 'error' && successMessage && (
+            <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm text-red-700">{successMessage}</p>
+                </div>
+                <div className="ml-auto pl-3">
+                  <div className="-mx-1.5 -my-1.5">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSubmitStatus('idle');
+                        setSuccessMessage('');
+                      }}
+                      className="inline-flex rounded-md p-1.5 text-red-500 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-600"
+                    >
+                      <span className="sr-only">Đóng</span>
+                      <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           <FormStatus status={submitStatus} />
           <SubmitButton 
             isLoading={isLoading} 
@@ -281,13 +364,14 @@ const ContactForm = () => {
           />
           
           {/* Hiển thị trạng thái validation */}
-          <div className="text-sm text-muted-foreground pt-2 border-t border-border">
+          {/* <div className="text-sm text-muted-foreground pt-2 border-t border-border">
             <p className="mb-1">Lưu ý:</p>
             <ul className="list-disc pl-5 space-y-1">
               <li>Các trường có dấu * là bắt buộc</li>
-              <li>Họ tên chỉ chấp nhận chữ cái và khoảng trắng</li>
+              <li>Họ tên có thể nhập tiếng Việt có dấu</li>
+              <li>Số điện thoại phải là số điện thoại Việt Nam hợp lệ</li>
             </ul>
-          </div>
+          </div> */}
         </form>
       </div>
 

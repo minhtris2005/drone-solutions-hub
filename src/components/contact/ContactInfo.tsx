@@ -131,7 +131,7 @@ const ContactInfo = ({ className = "" }: ContactInfoProps) => {
       </div>
 
       {/* Map - More Compact */}
-      <div className="rounded-xl overflow-hidden h-48">
+      <div className="rounded-xl overflow-hidden h-64">
         <div className="relative h-full">
           <iframe
             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.026905683275!2d106.66160506142168!3d10.809251108541229!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3175293ccc17367d%3A0x776e13bbfa8a0eef!2zSEFJIEFVIEJVSUxESU5HLCAzOUIgVHLGsOG7nW5nIFPGoW4sIFBoxrDhu51uZyAyLCBUw6JuIELDrG5oLCBUaMOgbmggcGjhu5EgSOG7kyBDaMOtIE1pbmgsIFZp4buHdCBOYW0!5e0!3m2!1svi!2s!4v1764823019547!5m2!1svi!2s"
@@ -147,8 +147,8 @@ const ContactInfo = ({ className = "" }: ContactInfoProps) => {
           <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-white/80 dark:from-gray-900/80 to-transparent pointer-events-none"></div>
           
           {/* Location Info */}
-          <div className="absolute bottom-3 left-3 right-3">
-            <div className="flex items-center justify-between bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg px-3 py-2 text-xs">
+          <div className="absolute top-3 left-80 right-4">
+            <div className="flex items-center justify-between bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl px-3 py-2 text-xs">
               <div className="flex items-center gap-2">
                 <MapPin className="w-3 h-3 text-primary" />
                 <span className="text-gray-700 dark:text-gray-300">TP. Hồ Chí Minh</span>

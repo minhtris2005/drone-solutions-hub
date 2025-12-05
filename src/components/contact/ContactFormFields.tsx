@@ -43,50 +43,52 @@ const ContactFormFields = ({
   ];
 
   // Hàm xử lý thay đổi với validation debounced
-  const handleChangeWithValidation = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
+  // Hàm xử lý thay đổi với validation debounced
+const handleChangeWithValidation = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const { name, value } = e.target;
+  
+  let newValue = value;
+  
+  // Xử lý chỉ cho phép nhập chữ cái cho trường name
+if (name === 'name') {
+  // KHÔNG filter gì cả - cho phép mọi ký tự
+  newValue = value;
+}
+  
+  // Xử lý tự động format số điện thoại
+  if (name === 'phone') {
+    // Loại bỏ tất cả ký tự không phải số
+    const numbers = value.replace(/\D/g, '');
     
-    let newValue = value;
-    
-    // Xử lý chỉ cho phép nhập chữ cái cho trường name
-    if (name === 'name') {
-      newValue = value.replace(/[^A-Za-zÀ-ỹ\s]/g, '');
+    // Nếu bắt đầu bằng 84, giữ nguyên 84
+    if (numbers.startsWith('84')) {
+      newValue = numbers;
+    } 
+    // Nếu bắt đầu bằng 0, giữ nguyên 0
+    else if (numbers.startsWith('0')) {
+      newValue = numbers;
     }
-    
-    // Xử lý tự động format số điện thoại
-    if (name === 'phone') {
-      // Loại bỏ tất cả ký tự không phải số
-      const numbers = value.replace(/\D/g, '');
-      
-      // Nếu bắt đầu bằng 84, giữ nguyên 84
-      if (numbers.startsWith('84')) {
-        newValue = numbers;
-      } 
-      // Nếu bắt đầu bằng 0, giữ nguyên 0
-      else if (numbers.startsWith('0')) {
-        newValue = numbers;
-      }
-      // Nếu không bắt đầu bằng gì cả nhưng có số
-      else if (numbers) {
-        newValue = '0' + numbers;
-      } else {
-        newValue = '';
-      }
+    // Nếu không bắt đầu bằng gì cả nhưng có số
+    else if (numbers) {
+      newValue = '0' + numbers;
+    } else {
+      newValue = '';
     }
-    
-    // Gọi onChange callback
-    onChange({
-      ...e,
-      target: {
-        ...e.target,
-        name,
-        value: newValue
-      }
-    } as React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>);
+  }
+  
+  // Gọi onChange callback
+  onChange({
+    ...e,
+    target: {
+      ...e.target,
+      name,
+      value: newValue
+    }
+  } as React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>);
 
-    // Debounced validation
-    debouncedValidate(name, newValue);
-  };
+  // Debounced validation
+  debouncedValidate(name, newValue);
+};
 
   // Hàm xử lý thay đổi select
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {

@@ -6,17 +6,19 @@ import delivery from '@/assets/services/icon1/delivery.png';
 import listence from '@/assets/services/icon1/listence.png';
 import buy from '@/assets/services/icon1/buy.png';
 import camera from '@/assets/services/icon1/camera.png';
+import { useLanguage } from "@/contexts/LanguageContext";
 
-const iconServices = [
-  { icon: repair, label: "Sửa chữa drone" },
-  { icon: map, label: "Drone trắc địa" },
-  { icon: delivery, label: "Drone vận chuyển" },
-  { icon: listence, label: "Dịch vụ phép bay" },
-  { icon: buy, label: "Nhập khẩu drone" },
-  { icon: camera, label: "Quay flycam" },
-];
 
 export default function IconServicesSection() {
+  const { t } = useLanguage();
+  const iconServices = [
+  { icon: repair, label: t(`services.${0}.title`) },
+  { icon: map, label: t(`services.${1}.title`) },
+  { icon: delivery, label: t(`services.${2}.title`) },
+  { icon: listence, label: t(`services.${3}.title`) },
+  { icon: buy, label: t(`services.${4}.title`) },
+  { icon: camera, label: t(`services.${5}.title`) },
+];
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {

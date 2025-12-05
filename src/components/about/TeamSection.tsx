@@ -3,37 +3,9 @@ import { motion, Variants } from "framer-motion";
 import long from "@/assets/team/Long.png";
 import khoi from "@/assets/team/Khoi.png";
 import sean from "@/assets/team/Sean.png";
+import { useLanguage } from "@/contexts/LanguageContext";
 
-const teamMembers = [
-  {
-    name: "Lâm Thứ Tiên",
-    position: "Chủ tịch",
-    image: long,
-    info: [
-      "Hơn 10 năm kinh nghiệm lãnh đạo và điều hành doanh nghiệp.",
-      "Nền tảng vững chắc trong lĩnh vực kinh doanh và phát triển công nghệ.",
-    ]
-  },
-  {
-    name: "Trần Anh Khôi",
-    position: "Tổng giám đốc", 
-    image: khoi,
-    info: [
-      "Hơn 10 năm kinh nghiệm trong lĩnh vực công nghệ.",
-      "Nhà sáng lập của nhiều doanh nghiệp tiên phong, những giải pháp 'lần đầu tiên có mặt tại Việt Nam'.",
-    ]
-  },
-  {
-    name: "Oh Sean Beom",
-    position: "Giám đốc Kinh doanh",
-    image: sean,
-    info: [
-      "Hơn 10 năm kinh nghiệm phát triển công nghệ.",
-      "Năng lực lãnh đạo mạnh mẽ.",
-      "Quản lý các dự án xuyên biên giới: Nhật Bản, Hàn Quốc, Việt Nam và châu Âu.",
-    ]
-  }
-];
+
 
 // Animation variants
 const containerVariants: Variants = {
@@ -125,6 +97,39 @@ const titleVariants: Variants = {
 };
 
 const TeamSection = () => {
+  const { t } = useLanguage();
+  const teamMembers = [
+  {
+    name: t("about.teamSection.members.tien.name"),
+    position: t("about.teamSection.members.tien.position"),
+    image: long,
+    info: [
+        t(`about.teamSection.members.tien.info.${0}`),
+        t(`about.teamSection.members.tien.info.${1}`)
+    ]
+  },
+  {
+    name: t("about.teamSection.members.khoi.name"),
+    position: t("about.teamSection.members.khoi.position"), 
+    image: khoi,
+    info: [
+      t(`about.teamSection.members.khoi.info.${0}`),
+      t(`about.teamSection.members.khoi.info.${1}`)
+    ]
+  },
+  {
+    name: t("about.teamSection.members.sean.name"),
+    position: t("about.teamSection.members.sean.position"),
+    image: sean,
+    info: [
+        t(`about.teamSection.members.khoi.info.${0}`),
+      t(`about.teamSection.members.khoi.info.${1}`),
+      t(`about.teamSection.members.khoi.info.${2}`)
+    ]
+  }
+];
+
+
   return (
     <section className="py-20 bg-background overflow-hidden">
       <div className="container mx-auto px-4">

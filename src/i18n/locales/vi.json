@@ -137,6 +137,68 @@
         "name": "— Đội ngũ Hitek Flycam —",
         "subtitle": "Sứ mệnh & Tầm nhìn"
       }
+    },
+    "teamSection": {
+      "title": "Đội ngũ lãnh đạo",
+      "members": {
+        "tien": {
+          "name": "Lâm Thứ Tiên",
+          "position": "Chủ tịch",
+          "info": [
+            "Hơn 10 năm kinh nghiệm lãnh đạo và điều hành doanh nghiệp.",
+            "Nền tảng vững chắc trong lĩnh vực kinh doanh và phát triển công nghệ."
+          ]
+        },
+        "khoi": {
+          "name": "Trần Anh Khôi",
+          "position": "Tổng giám đốc",
+          "info": [
+            "Hơn 10 năm kinh nghiệm trong lĩnh vực công nghệ.",
+            "Nhà sáng lập của nhiều doanh nghiệp tiên phong, những giải pháp 'lần đầu tiên có mặt tại Việt Nam'."
+          ]
+        },
+        "sean": {
+          "name": "Oh Sean Beom",
+          "position": "Giám đốc Kinh doanh",
+          "info": [
+            "Hơn 10 năm kinh nghiệm phát triển công nghệ.",
+            "Năng lực lãnh đạo mạnh mẽ.",
+            "Quản lý các dự án xuyên biên giới: Nhật Bản, Hàn Quốc, Việt Nam và châu Âu."
+          ]
+        }
+      }
+    }
+  },
+  "servicesPage": {
+    "servicesHero": {
+      "title": {
+        "main": "DỊCH VỤ",
+        "highlight": "FLYCAM"
+      },
+      "subtitle": "Giải pháp toàn diện - Chuyên nghiệp - Hiệu quả",
+      "cta": {
+        "contact": "Liên hệ tư vấn ngay",
+        "pricing": "Báo giá dịch vụ"
+      }
+    },
+    "servicesIntro": {
+      "left": {
+        "title": "Hitek Flycam",
+        "line1": "Cung cấp dịch vụ chuyên nghiệp",
+        "line2": "& Giải pháp toàn diện về Drone",
+        "learnMore": "Tìm hiểu thêm"
+      },
+      "right": {
+        "part1": {
+          "brand": "Hitek Flycam",
+          "text1": "là thương hiệu trực thuộc",
+          "group": "Hitek Group JSC",
+          "text2": "– tập đoàn công nghệ uy tín tiên phong trong lĩnh vực Drone Show tại Việt Nam. Chúng tôi cung cấp",
+          "highlight": "giải pháp Drone toàn diện cho mọi nhu cầu",
+          "text3": "– từ quay phim, khảo sát địa hình, vận chuyển, sửa chữa, đến xin giấy phép bay và nhập khẩu Drone chuyên dụng."
+        },
+        "part2": "Với nền tảng công nghệ vững chắc từ hệ sinh thái Hitek Group, Hitek Flycam cam kết mang đến độ chính xác, an toàn và hiệu quả vượt trội cho từng dự án."
+      }
     }
   },
   "services": [

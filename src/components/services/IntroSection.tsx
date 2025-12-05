@@ -2,8 +2,10 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function IntroSection() {
+  const { t } = useLanguage();
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -144,7 +146,7 @@ export default function IntroSection() {
                 className="text-4xl font-bold text-foreground dark:text-foreground mb-4"
                 variants={textVariants}
               >
-                Hitek Flycam
+                {t("servicesPage.servicesIntro.left.title")}
               </motion.h2>
               
               <motion.p 
@@ -152,8 +154,8 @@ export default function IntroSection() {
                 variants={textVariants}
                 transition={{ delay: 0.1 }}
               >
-                Cung cấp dịch vụ chuyên nghiệp <br />
-                & Giải pháp toàn diện về Drone
+                {t("servicesPage.servicesIntro.left.line1")}<br />
+                {t("servicesPage.servicesIntro.left.line2")}
               </motion.p>
               
               <Link to="/gioi-thieu">
@@ -162,6 +164,7 @@ export default function IntroSection() {
                   variants={linkVariants}
                   whileHover="hover"
                 >
+                  {t("servicesPage.servicesIntro.left.learnMore")}
                   Tìm hiểu thêm
                   <motion.span
                     animate={{ x: [0, 3, 0] }}
@@ -192,30 +195,27 @@ export default function IntroSection() {
                 variants={highlightVariants}
                 animate="visible"
               >
-                Hitek Flycam{" "}
+                {t("servicesPage.servicesIntro.right.part1.brand")}{" "}
               </motion.span>
-              là thương hiệu trực thuộc{" "}
+              {t("servicesPage.servicesIntro.right.part1.text1")}{" "}
               <motion.span 
                 className="font-bold text-primary dark:text-primary"
                 variants={highlightVariants}
                 animate="visible"
                 style={{ animationDelay: "0.2s" }}
               >
-                Hitek Group JSC{" "}
+                {t("servicesPage.servicesIntro.right.part1.group")}{" "}
               </motion.span>
-              – tập đoàn công nghệ uy tín tiên phong trong lĩnh vực 
-              Drone Show tại Việt Nam. Chúng tôi cung cấp{" "}
+              {t("servicesPage.servicesIntro.right.part1.text2")}{" "}
               <motion.span 
                 className="font-bold text-primary dark:text-primary"
                 variants={highlightVariants}
                 animate="visible"
                 style={{ animationDelay: "0.4s" }}
               >
-                giải pháp Drone toàn diện cho mọi nhu cầu{" "}
+                {t("servicesPage.servicesIntro.right.part1.highlight")}{" "}
               </motion.span>
-              – từ quay phim, khảo sát địa hình, 
-              vận chuyển, sửa chữa, đến xin giấy phép bay và nhập khẩu Drone 
-              chuyên dụng.
+              {t("servicesPage.servicesIntro.right.part1.text3")}
             </motion.p>
             
             <motion.p 
@@ -223,9 +223,7 @@ export default function IntroSection() {
               transition={{ delay: 0.3 }}
               className="leading-relaxed"
             >
-              Với nền tảng công nghệ vững chắc từ hệ sinh thái 
-              Hitek Group, Hitek Flycam cam kết mang đến độ chính xác, an toàn 
-              và hiệu quả vượt trội cho từng dự án.
+              {t("servicesPage.servicesIntro.right.part2")}
             </motion.p>
 
             {/* Decorative floating elements */}

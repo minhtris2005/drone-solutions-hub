@@ -5,8 +5,10 @@ import { ArrowRight, Camera, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import BgServices from "@/assets/home/bg.png";
 import LgFlycam from "@/assets/logo/logo-flycam-hitek.png";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function ServicesHero() {
+  const { t } = useLanguage();
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -70,7 +72,7 @@ export default function ServicesHero() {
               </div>
               <div>
                 <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-foreground mb-4 leading-tight">
-                  DỊCH VỤ{" "}
+                  {t("servicesPage.servicesHero.title.main")}{" "}
                   <motion.span 
                     className="text-primary"
                     animate={{
@@ -86,7 +88,7 @@ export default function ServicesHero() {
                       ease: "easeInOut"
                     }}
                   >
-                    FLYCAM
+                    {t("servicesPage.servicesHero.title.highlight")}
                   </motion.span>
                 </h1>
                 <motion.p 
@@ -95,7 +97,7 @@ export default function ServicesHero() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.8, duration: 1 }}
                 >
-                  Giải pháp toàn diện - Chuyên nghiệp - Hiệu quả
+                  {t("servicesPage.servicesHero.subtitle")}
                 </motion.p>
               </div>
             </div>
@@ -112,7 +114,7 @@ export default function ServicesHero() {
             <Button asChild size="lg" className="text-xl px-10 py-7 rounded-2xl">
               <Link to="/lien-he">
                 <Camera className="mr-3 w-6 h-6" />
-                Liên hệ tư vấn ngay
+                {t("servicesPage.servicesHero.cta.contact")}
                 <ArrowRight className="ml-3 w-6 h-6" />
               </Link>
             </Button>
@@ -120,7 +122,7 @@ export default function ServicesHero() {
             <Button asChild variant="outline" size="lg" className="text-xl px-10 py-7 rounded-2xl border-2">
               <Link to="/bang-gia">
                 <Shield className="mr-3 w-6 h-6" />
-                Báo giá dịch vụ
+                {t("servicesPage.servicesHero.cta.pricing")}
               </Link>
             </Button>
           </motion.div>

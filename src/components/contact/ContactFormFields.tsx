@@ -43,7 +43,6 @@ const ContactFormFields = ({
   ];
 
   // Hàm xử lý thay đổi với validation debounced
-  // Hàm xử lý thay đổi với validation debounced
 const handleChangeWithValidation = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
   const { name, value } = e.target;
   

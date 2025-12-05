@@ -142,9 +142,16 @@ serve(async (req) => {
         </div>
         
         <div class="content">
+            <div class="highlight">
+                <p><strong>📋 Thông tin liên hệ:</strong></p>
+                <p>Người gửi: <strong>${name}</strong></p>
+                <p>Thời gian: <strong>${new Date().toLocaleString('vi-VN')}</strong></p>
+                <p>ID: <strong>${dbRecordId ? 'HD' + dbRecordId.toString().padStart(6, '0') : 'Chưa lưu DB'}</strong></p>
+            </div>
+            
             <table>
                 <tr>
-                    <td class="label" width="100%">👤 Họ và tên:</td>
+                    <td class="label" width="30%">👤 Họ và tên:</td>
                     <td class="value">${name}</td>
                 </tr>
                 <tr>
@@ -180,7 +187,26 @@ serve(async (req) => {
             
             <hr style="margin: 30px 0; border: 1px solid #e5e7eb;">
             
+            <div style="margin-top: 30px; padding: 15px; background: #f3f4f6; border-radius: 6px; font-size: 14px;">
+                <p><strong>📊 Thông tin hệ thống:</strong></p>
+                <table>
+                    <tr>
+                        <td width="40%">Domain gửi:</td>
+                        <td>em1368.vibecoding.hitek.com.vn</td>
+                    </tr>
+                    <tr>
+                        <td>Thời gian xử lý:</td>
+                        <td>${new Date().toISOString()}</td>
+                    </tr>
+                    <tr>
+                        <td>Trạng thái:</td>
+                        <td>Đang chờ xử lý</td>
+                    </tr>
+                </table>
+            </div>
+            
             <div style="margin-top: 30px; text-align: center; color: #6b7280; font-size: 14px;">
+                <p>Đây là email tự động từ hệ thống Hitek Flycam.</p>
                 <p>Vui lòng phản hồi trong vòng 24 giờ làm việc.</p>
                 <p style="margin-top: 10px;">
                     <a href="mailto:${email}" style="background: #3b82f6; color: white; padding: 8px 16px; border-radius: 4px; text-decoration: none; display: inline-block;">
@@ -238,6 +264,10 @@ serve(async (req) => {
                 <h3 style="margin-top: 0; color: #059669; border-bottom: 2px solid #d1fae5; padding-bottom: 10px;">📋 Thông tin yêu cầu của bạn</h3>
                 <table style="width: 100%;">
                     <tr>
+                        <td style="padding: 8px 0;"><strong>Mã yêu cầu:</strong></td>
+                        <td style="padding: 8px 0;"><strong style="color: #3b82f6;">${dbRecordId ? 'HD' + dbRecordId.toString().padStart(6, '0') : 'Đang xử lý'}</strong></td>
+                    </tr>
+                    <tr>
                         <td style="padding: 8px 0;"><strong>Dịch vụ:</strong></td>
                         <td style="padding: 8px 0;">
                             ${service ? '<span class="service-badge">' + (serviceOptions.find(s => s.value === service)?.label || service) + '</span>' : '<span style="color: #6b7280;">Chưa chọn dịch vụ cụ thể</span>'}
@@ -259,11 +289,11 @@ serve(async (req) => {
                 <table style="width: 100%;">
                     <tr>
                         <td style="padding: 8px 0;"><strong>Hotline:</strong></td>
-                        <td style="padding: 8px 0;"><a href="tel:(+84) 28 99 95 95 88" style="color: #3b82f6;">(+84) 28 99 95 95 88</a></td>
+                        <td style="padding: 8px 0;"><a href="tel:0346124230" style="color: #3b82f6;">0346 124 230</a></td>
                     </tr>
                     <tr>
                         <td style="padding: 8px 0;"><strong>Email:</strong></td>
-                        <td style="padding: 8px 0;"><a href="mailto:contact@hitek.com.vn" style="color: #3b82f6;"> contact@hitek.com.vn</a></td>
+                        <td style="padding: 8px 0;"><a href="mailto:support@hitekflycam.vn" style="color: #3b82f6;">support@hitekflycam.vn</a></td>
                     </tr>
                     <tr>
                         <td style="padding: 8px 0;"><strong>Website:</strong></td>
@@ -277,7 +307,8 @@ serve(async (req) => {
             </div>
             
             <div style="text-align: center; margin: 25px 0;">
-                <a href="mailto:contact@hitek.com.vn" class="button" style="background: #10b981;">📧 Gửi email</a>
+                <a href="tel:0346124230" class="button" style="margin-right: 10px;">📞 Gọi ngay</a>
+                <a href="mailto:support@hitekflycam.vn" class="button" style="background: #10b981;">📧 Gửi email</a>
             </div>
             
             <div style="background: #fef3c7; padding: 20px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #f59e0b;">
@@ -292,6 +323,9 @@ serve(async (req) => {
             <div class="footer">
                 <p>Trân trọng,</p>
                 <p style="font-size: 18px; color: #2563eb; font-weight: bold;">Đội ngũ Hitek Flycam</p>
+                <p>📍 TP. Hồ Chí Minh, Việt Nam</p>
+                <p>📧 support@hitekflycam.vn | 📞 0346 124 230</p>
+                
                 <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
                     <p style="font-size: 12px; color: #9ca3af; margin: 5px 0;">
                         © ${new Date().getFullYear()} Hitek Flycam. All rights reserved.

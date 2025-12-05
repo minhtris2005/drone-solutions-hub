@@ -29,7 +29,7 @@ const QuoteSection = () => {
       opacity: 1,
       y: 0,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         damping: 15,
         stiffness: 80,
         duration: 1.2
@@ -43,7 +43,7 @@ const QuoteSection = () => {
       scale: 1,
       rotate: 0,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         damping: 15,
         stiffness: 100,
         duration: 1
@@ -56,7 +56,7 @@ const QuoteSection = () => {
     transition: {
       duration: 4,
       repeat: Infinity,
-      ease: "easeInOut"
+      ease: "easeInOut" as const
     }
   };
 
@@ -66,7 +66,7 @@ const QuoteSection = () => {
     transition: {
       duration: 3,
       repeat: Infinity,
-      ease: "easeInOut"
+      ease: "easeInOut" as const
     }
   };
 
@@ -166,7 +166,7 @@ const QuoteSection = () => {
                     initial={{ opacity: 0.9 }}
                     whileHover={{ opacity: 1 }}
                   >
-                    "{t(`about.quote.content.${0}`)}{" "}
+                    "{t("about.quote.content.0" as any)}{" "}
                     <motion.span 
                       className="font-semibold text-red-600 dark:text-red-400"
                       whileHover={{ 
@@ -174,8 +174,8 @@ const QuoteSection = () => {
                         textShadow: "0 0 20px rgba(239, 68, 68, 0.3)"
                       }}
                     >
-                      {t(`about.quote.content.${1}`)}
-                    </motion.span> {t(`about.quote.content.${2}`)}
+                      {t("about.quote.content.1" as any)}
+                    </motion.span> {t("about.quote.content.2" as any)}
                     {" "}
                     <motion.span 
                       className="font-semibold text-red-600 dark:text-red-400"
@@ -184,9 +184,9 @@ const QuoteSection = () => {
                         textShadow: "0 0 20px rgba(239, 68, 68, 0.3)"
                       }}
                     >
-                      {t(`about.quote.content.${3}`)}
+                      {t("about.quote.content.3" as any)}
                     </motion.span>{" "}
-                    {t(`about.quote.content.${4}`)}"
+                    {t("about.quote.content.4" as any)}"
                   </motion.p>
                 </div>
                 

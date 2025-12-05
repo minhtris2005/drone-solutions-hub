@@ -12,11 +12,5 @@ export const translations = {
   kr,
 } as const;
 
-export type TranslationKey = FlattenObject<typeof vi>;
-
-// Utility type để lấy tất cả keys dạng flattened
-type FlattenObject<T extends object> = {
-  [K in keyof T]: T[K] extends object 
-    ? `${K & string}.${FlattenObject<T[K]> & string}`
-    : K
-}[keyof T];
+// Simplified type - accept any string to avoid deep recursion issues
+export type TranslationKey = string;

@@ -71,12 +71,12 @@ export default function Navbar() {
 
   // ----- NAVIGATION LINKS -----
   const navLinks = [
-    { name: t('nav.home'), href: "/", onClick: scrollToTop },
-    { name: t('nav.about'), href: "/gioi-thieu", onClick: scrollToTop },
-    { name: t('nav.services.title'), href: "/dich-vu", hasDropdown: true, onClick: scrollToTop },
-    { name: t('nav.document'), href: "/tai-lieu", onClick: scrollToTop },
-    { name: t('nav.blog'), href: "/blog", onClick: scrollToTop },
-    { name: t('nav.contact'), href: "/lien-he", onClick: scrollToTop },
+    { name: t('nav.home' as any), href: "/", onClick: scrollToTop },
+    { name: t('nav.about' as any), href: "/gioi-thieu", onClick: scrollToTop },
+    { name: t('nav.services.title' as any), href: "/dich-vu", hasDropdown: true, onClick: scrollToTop },
+    { name: t('nav.document' as any), href: "/tai-lieu", onClick: scrollToTop },
+    { name: t('nav.blog' as any), href: "/blog", onClick: scrollToTop },
+    { name: t('nav.contact' as any), href: "/lien-he", onClick: scrollToTop },
   ];
 
   // ----- RENDER SERVICES DROPDOWN -----
@@ -96,7 +96,7 @@ export default function Navbar() {
           className="block px-4 py-3 text-pure-black dark:text-pure-white hover:text-vibrant-red dark:hover:text-vibrant-red hover:bg-light-gray dark:hover:bg-warm-gray transition-colors"
           onClick={scrollToTop}
         >
-          {t(service.name)}
+          {t(service.name as any)}
         </Link>
       ))}
     </motion.div>
@@ -226,7 +226,7 @@ export default function Navbar() {
                             className="block px-4 py-2 text-sm text-pure-black dark:text-pure-white hover:text-vibrant-red dark:hover:text-vibrant-red hover:bg-light-gray dark:hover:bg-warm-gray rounded-md transition-colors"
                             onClick={scrollToTop}
                           >
-                            {t(service.name)}
+                            {t(service.name as any)}
                           </Link>
                         ))}
                       </div>

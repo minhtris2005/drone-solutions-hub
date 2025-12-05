@@ -27,7 +27,7 @@ const WhyTrustSection = () => {
       opacity: 1,
       y: 0,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         damping: 15,
         stiffness: 100,
         duration: 0.8
@@ -41,7 +41,7 @@ const WhyTrustSection = () => {
       opacity: 1,
       scale: 1,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         damping: 20,
         stiffness: 80,
         duration: 1

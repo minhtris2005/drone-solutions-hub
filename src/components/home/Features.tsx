@@ -77,7 +77,7 @@ export default function Features() {
       opacity: 1,
       y: 0,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         damping: 25,
         stiffness: 100,
         duration: 0.8
@@ -91,7 +91,7 @@ export default function Features() {
       opacity: 1,
       y: 0,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         damping: 25,
         stiffness: 100,
         duration: 0.8,
@@ -217,7 +217,7 @@ function FeatureCard({
       y: 0,
       scale: 1,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         damping: 20,
         stiffness: 100,
         duration: 0.6,
@@ -235,7 +235,7 @@ function FeatureCard({
       rotate: 0,
       scale: 1,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         stiffness: 200,
         damping: 20,
         delay: delay + 0.1
@@ -257,7 +257,7 @@ function FeatureCard({
       transition: {
         duration: 0.8,
         delay: delay + 0.5,
-        ease: "easeOut"
+        ease: "easeOut" as const
       }
     }
   };

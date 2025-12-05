@@ -28,7 +28,7 @@ export default function Hero() {
       opacity: 1,
       y: 0,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         damping: 20,
         stiffness: 100,
         duration: 0.8
@@ -41,7 +41,7 @@ export default function Hero() {
     transition: {
       duration: 4,
       repeat: Infinity,
-      ease: "easeInOut"
+      ease: "easeInOut" as const
     }
   };
 

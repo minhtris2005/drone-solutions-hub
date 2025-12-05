@@ -28,7 +28,7 @@ const AboutSection = () => {
       x: 0,
       y: 0,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         damping: 20,
         stiffness: 100,
         duration: 0.8
@@ -51,7 +51,7 @@ const AboutSection = () => {
       scale: 1,
       rotate: 0,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         damping: 20,
         stiffness: 100,
         duration: 1
@@ -62,7 +62,7 @@ const AboutSection = () => {
       rotate: 1,
       boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
       transition: {
-        type: "spring",
+        type: "spring" as const,
         stiffness: 300,
         damping: 15
       }
@@ -80,7 +80,7 @@ const AboutSection = () => {
       y: 0,
       scale: 1,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         damping: 25,
         stiffness: 150,
         duration: 0.6
@@ -99,7 +99,7 @@ const AboutSection = () => {
       y: 0,
       scale: 1,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         damping: 25,
         stiffness: 120,
         duration: 0.7
@@ -123,7 +123,7 @@ const AboutSection = () => {
         duration: 2,
         repeat: Infinity,
         repeatType: "reverse" as const,
-        ease: "easeInOut"
+        ease: "easeInOut" as const
       }
     }
   };
@@ -203,7 +203,7 @@ const AboutSection = () => {
                 >
                   {t("about.AboutSection.title.highlight")}{" "}
                 </motion.span>
-                {t(`about.AboutSection.paragraphs.${0}`)}
+                {t("about.AboutSection.paragraphs.0" as any)}
               </motion.p>
               
               <motion.p 
@@ -211,7 +211,7 @@ const AboutSection = () => {
                 transition={{ delay: 0.1 }}
                 className="leading-relaxed text-foreground"
               >
-                {t(`about.AboutSection.paragraphs.${1}`)}
+                {t("about.AboutSection.paragraphs.1" as any)}
               </motion.p>
             </div>
 

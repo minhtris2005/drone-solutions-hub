@@ -60,7 +60,7 @@ export default function FeaturedProjectsSection() {
       y: 0,
       scale: 1,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         stiffness: 80,
         damping: 12,
         duration: 0.7
@@ -77,7 +77,7 @@ export default function FeaturedProjectsSection() {
       opacity: 1, 
       y: 0,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         stiffness: 100,
         damping: 15,
         duration: 0.8
@@ -94,7 +94,7 @@ export default function FeaturedProjectsSection() {
       opacity: 1, 
       x: 0,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         stiffness: 100,
         damping: 15,
         duration: 0.8,

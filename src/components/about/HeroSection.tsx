@@ -26,7 +26,7 @@ export default function HeroSection() {
       opacity: 1,
       y: 0,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         damping: 15,
         stiffness: 80,
         duration: 1
@@ -39,7 +39,7 @@ export default function HeroSection() {
     transition: {
       duration: 4,
       repeat: Infinity,
-      ease: "easeInOut"
+      ease: "easeInOut" as const
     }
   };
 

@@ -32,7 +32,7 @@ const ConnectionSection = () => {
       opacity: 1,
       y: 0,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         damping: 15,
         stiffness: 100,
         duration: 0.8
@@ -47,7 +47,7 @@ const ConnectionSection = () => {
       scale: 1,
       rotate: 0,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         damping: 20,
         stiffness: 80,
         duration: 1
@@ -130,7 +130,7 @@ const ConnectionSection = () => {
                 className="text-lg text-muted-foreground dark:text-gray-300 leading-relaxed"
                 initial={{ opacity: 0.8 }}
               >
-                {t(`about.connection.description.${0}`)} <span className="font-semibold text-foreground dark:text-white">{t(`about.connection.description.${1}`)}</span> {t(`about.connection.description.${2}`)} <span className="font-semibold text-primary">{t(`about.connection.description.${3}`)}</span> {t(`about.connection.description.${4}`)}
+                {t("about.connection.description.0" as any)} <span className="font-semibold text-foreground dark:text-white">{t("about.connection.description.1" as any)}</span> {t("about.connection.description.2" as any)} <span className="font-semibold text-primary">{t("about.connection.description.3" as any)}</span> {t("about.connection.description.4" as any)}
               </motion.p>
             </motion.div>
 

@@ -32,7 +32,7 @@ export default function TopSolution() {
       y: 0,
       scale: 1,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         damping: 25,
         stiffness: 100,
         duration: 0.6
@@ -52,7 +52,7 @@ export default function TopSolution() {
       scale: 1,
       rotate: 0,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         damping: 25,
         stiffness: 100,
         duration: 0.8
@@ -62,7 +62,7 @@ export default function TopSolution() {
       scale: 1.05,
       rotate: 1,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         damping: 15,
         stiffness: 300
       }
@@ -74,7 +74,7 @@ export default function TopSolution() {
     hover: {
       scale: 1.05,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         stiffness: 400,
         damping: 10
       }
@@ -91,7 +91,7 @@ export default function TopSolution() {
     transition: {
       duration: 6,
       repeat: Infinity,
-      ease: "easeInOut"
+      ease: "easeInOut" as const
     }
   };
 

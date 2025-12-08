@@ -18,6 +18,7 @@ import Services from "./pages/Services";
 import About from "./pages/About";
 import Documents from "./pages/Documents";
 import Blog from "./pages/Blog";
+import BlogDetail from "./pages/blog/BlogDetail";
 import Contact from "./pages/ContactPage";
 import NotFound from "./pages/NotFound";
 
@@ -91,7 +92,8 @@ const AppContent = () => {
         <Route path="/dich-vu/:slug" element={<Services />} />
         <Route path="/tai-lieu" element={<Documents />} />
         <Route path="/blog" element={<Blog />} />
-        <Route path="/blog/:id" element={<Blog />} /> {/* Thêm route chi tiết bài viết */}
+         {/* Trang chi tiết (QUAN TRỌNG) */}
+        <Route path="/blog/:id" element={<BlogDetail />} />
         <Route path="/lien-he" element={<Contact />} />
 
         {/* 404 */}

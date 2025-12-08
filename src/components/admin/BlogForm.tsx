@@ -1,286 +1,369 @@
-import { useState, useRef } from 'react'
-import { useAuth } from '@/contexts/AuthContext'
-import { BlogPost } from '@/types'
-import { supabase } from '@/services/supabase'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { Label } from '@/components/ui/label'
-import { Image, Upload, X, Loader2 } from 'lucide-react'
-import { Alert, AlertDescription } from '@/components/ui/alert'
+  import { useState, useRef, useEffect } from 'react'
+  import { useAuth } from '@/contexts/AuthContext'
+  import { BlogPost } from '@/types'
+  import { supabase } from '@/services/supabase'
+  import { Button } from '@/components/ui/button'
+  import { Input } from '@/components/ui/input'
+  import { Textarea } from '@/components/ui/textarea'
+  import { Label } from '@/components/ui/label'
+  import { Upload, X, Loader2, AlertCircle, Check, Eye } from 'lucide-react'
+  import { Alert, AlertDescription } from '@/components/ui/alert'
+  import RichTextEditor from "@/components/RichTextEditor"
+  import { Badge } from "@/components/ui/badge"
+  import { Separator } from "@/components/ui/separator"
 
-interface BlogFormProps {
-  post?: BlogPost | null
-  onSuccess: () => void
-}
+  interface BlogFormProps {
+    post?: BlogPost | null
+    onSuccess: () => void
+  }
 
-const categories = [
-  'Tin tức',
-  'Hướng dẫn', 
-  'Review',
-  'Công nghệ',
-  'Sản phẩm',
-  'Pháp lý',
-  'Nhiếp ảnh',
-  'Bảo trì',
-]
+  const categories = [
+    'Tin tức',
+    'Hướng dẫn',
+    'Review',
+    'Công nghệ',
+    'Sản phẩm',
+    'Pháp lý',
+    'Nhiếp ảnh',
+    'Bảo trì',
+  ]
 
-export const BlogForm: React.FC<BlogFormProps> = ({ post, onSuccess }) => {
-  const { user } = useAuth()
-  const [loading, setLoading] = useState(false)
-  const [uploading, setUploading] = useState(false)
-  const [previewImage, setPreviewImage] = useState<string>(post?.image || '')
-  const [error, setError] = useState<string>('')
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  export const BlogForm: React.FC<BlogFormProps> = ({ post, onSuccess }) => {
+    const { user } = useAuth()
+    const [loading, setLoading] = useState(false)
+    const [uploading, setUploading] = useState(false)
+    const [previewImage, setPreviewImage] = useState<string>(post?.image || '')
+    const [error, setError] = useState<string>('')
+    const [seoChecks, setSeoChecks] = useState({
+      hasTitle: false,
+      hasContent: false,
+      hasImage: false,
+      hasMetaDescription: false,
+      hasHeadings: false,
+    })
+    const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const [formData, setFormData] = useState({
-    title: post?.title || '',
-    excerpt: post?.excerpt || '',
-    content: post?.content || '',
-    image: post?.image || '', // URL từ storage
-    date: post?.date || new Date().toISOString().split('T')[0],
-    author: post?.author || user?.email?.split('@')[0] || '',
-    category: post?.category || categories[0],
-    status: post?.status || 'draft',
-  })
+    const [formData, setFormData] = useState({
+      title: post?.title || '',
+      excerpt: post?.excerpt || '',
+      content: post?.content || '',
+      image: post?.image || '',
+      date: post?.date || new Date().toISOString().split('T')[0],
+      author: post?.author || user?.email?.split('@')[0] || '',
+      category: post?.category || categories[0],
+      status: post?.status || 'draft',
+    })
 
-  // Hàm upload ảnh lên Supabase Storage
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+    // Kiểm tra SEO khi formData thay đổi
+    useEffect(() => {
+      checkSEO()
+    }, [formData])
 
-    setError('')
-    setUploading(true)
-
-    try {
-      // Check file type
-      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
-      if (!validTypes.includes(file.type)) {
-        setError('Chỉ chấp nhận file ảnh (JPEG, PNG, GIF, WebP)')
-        return
+    const checkSEO = () => {
+      const checks = {
+        hasTitle: formData.title.length > 10 && formData.title.length < 70,
+        hasContent: formData.content.length > 300,
+        hasImage: formData.image.length > 0,
+        hasMetaDescription:  (formData.excerpt.length >= 120 && formData.excerpt.length <= 160),
+        hasHeadings: /<h[1-3][^>]*>.*?<\/h[1-3]>/i.test(formData.content),
       }
+      setSeoChecks(checks)
+    }
 
-      // Check file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        setError('File quá lớn. Vui lòng chọn file nhỏ hơn 5MB')
-        return
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0]
+      if (!file) return
+
+      setError('')
+      setUploading(true)
+
+      try {
+        const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
+        if (!validTypes.includes(file.type)) {
+          setError('Chỉ chấp nhận file ảnh (JPEG, PNG, GIF, WebP)')
+          return
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+          setError('File quá lớn. Vui lòng chọn file nhỏ hơn 5MB')
+          return
+        }
+
+        const fileExt = file.name.split('.').pop()
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
+        const filePath = `blog-images/${fileName}`
+
+        const { error: uploadError } = await supabase.storage
+          .from('blog-images')
+          .upload(filePath, file)
+
+        if (uploadError) throw uploadError
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('blog-images')
+          .getPublicUrl(filePath)
+
+        setPreviewImage(publicUrl)
+        setFormData(prev => ({ ...prev, image: publicUrl }))
+
+      } catch (error: any) {
+        console.error('Error uploading image:', error)
+
+        if (error.message?.includes('bucket') || error.message?.includes('not found')) {
+          setError('Bucket "blog-images" chưa được tạo trong Supabase.')
+        } else {
+          setError(`Có lỗi khi upload ảnh: ${error.message}`)
+        }
+      } finally {
+        setUploading(false)
       }
+    }
 
-      // Tạo tên file unique
-      const fileExt = file.name.split('.').pop()
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
-      const filePath = `blog-images/${fileName}`
+    const removeImage = () => {
+      setPreviewImage('')
+      setFormData(prev => ({ ...prev, image: '' }))
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+    }
 
-      // Upload lên storage bucket 'blog-images'
-      const { data, error: uploadError } = await supabase.storage
-        .from('blog-images') // Cần tạo bucket này trong Supabase Storage
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false
-        })
+    const handleImageUrlChange = (url: string) => {
+      setFormData(prev => ({ ...prev, image: url }))
+      setPreviewImage(url)
+    }
 
-      if (uploadError) throw uploadError
+    const handleSubmit = async (e: React.FormEvent) => {
+      e.preventDefault()
+      setLoading(true)
+      setError('')
 
-      // Lấy public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('blog-images')
-        .getPublicUrl(filePath)
+      try {
+        if (!formData.title.trim()) {
+          setError('Vui lòng nhập tiêu đề')
+          return
+        }
+        if (!formData.excerpt.trim()) {
+          setError('Vui lòng nhập tóm tắt')
+          return
+        }
+        if (!formData.image.trim()) {
+          setError('Vui lòng thêm hình ảnh cho bài viết')
+          return
+        }
+        if (!formData.content.trim() || formData.content.trim().length < 50) {
+          setError('Vui lòng nhập nội dung chi tiết (ít nhất 50 ký tự)')
+          return
+        }
 
-      // Cập nhật preview và form data
-      setPreviewImage(publicUrl)
-      setFormData(prev => ({ ...prev, image: publicUrl }))
+        // Tạo slug từ tiêu đề cho SEO friendly URL
+        const createSlug = (text: string) => {
+          return text
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^\w\s-]/g, '')
+            .replace(/\s+/g, '-')
+            .trim()
+        }
+
+        const blogData: any = {
+          title: formData.title.trim(),
+          excerpt: formData.excerpt.trim(),
+          content: formData.content.trim(),
+          image: formData.image,
+          date: formData.date,
+          author: formData.author.trim() || user?.email?.split('@')[0] || 'Admin',
+          category: formData.category,
+          status: formData.status,
+          user_id: user?.id,
+          slug: post?.slug || createSlug(formData.title),
+          meta_title: formData.title.substring(0, 60),
+          meta_description: formData.excerpt.substring(0, 160),
+        }
+
+        if (post?.id) {
+          const { error } = await supabase
+            .from('blog_posts')
+            .update(blogData)
+            .eq('id', post.id)
+
+          if (error) throw error
+        } else {
+          const { error } = await supabase
+            .from('blog_posts')
+            .insert([blogData])
+
+          if (error) throw error
+        }
+
+        onSuccess()
+      } catch (error: any) {
+        console.error('Error saving post:', error)
+        setError(`Lỗi: ${error.message}`)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    const getSEOAdvice = () => {
+      const advice = []
       
-    } catch (error: any) {
-      console.error('Error uploading image:', error)
+      if (!seoChecks.hasTitle) {
+        advice.push('Tiêu đề nên từ 10-70 ký tự')
+      }
+      if (!seoChecks.hasMetaDescription) {
+        advice.push('Tóm tắt (meta description) nên từ 120-160 ký tự')
+      }
+      if (!seoChecks.hasContent) {
+        advice.push('Nội dung nên có ít nhất 300 ký tự')
+      }
+      if (!seoChecks.hasImage) {
+        advice.push('Thêm hình ảnh chính cho bài viết')
+      }
+      if (!seoChecks.hasHeadings) {
+        advice.push('Thêm tiêu đề (Heading H1, H2, H3) vào nội dung')
+      }
       
-      // Kiểm tra nếu bucket chưa tồn tại
-      if (error.message?.includes('bucket') || error.message?.includes('not found')) {
-        setError('Bucket "blog-images" chưa được tạo. Vui lòng tạo bucket trong Supabase Storage.')
-      } else {
-        setError(`Có lỗi khi upload ảnh: ${error.message}`)
-      }
-    } finally {
-      setUploading(false)
+      return advice
     }
-  }
 
-  // Xóa ảnh
-  const removeImage = () => {
-    setPreviewImage('')
-    setFormData(prev => ({ ...prev, image: '' }))
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ''
-    }
-  }
+    const seoAdvice = getSEOAdvice()
 
-  // Xử lý URL ảnh từ internet
-  const handleImageUrlChange = (url: string) => {
-    setFormData(prev => ({ ...prev, image: url }))
-    setPreviewImage(url)
-  }
+    return (
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          {/* Tiêu đề */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="title">Tiêu đề *</Label>
+              <Badge variant={seoChecks.hasTitle ? "default" : "outline"} className="text-xs">
+                {formData.title.length}/70
+              </Badge>
+            </div>
+            <Input
+              id="title"
+              value={formData.title}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              required
+              disabled={loading}
+              placeholder="Tiêu đề hấp dẫn, chứa từ khóa chính..."
+              maxLength={70}
+              className="placeholder:text-gray-400"
+            />
+            <p className="text-xs text-gray-500">
+              Tiêu đề sẽ hiển thị trên Google. Tối ưu: 10-70 ký tự.
+            </p>
+          </div>
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError('')
+          {/* Danh mục */}
+          <div className="space-y-2">
+            <Label htmlFor="category" className="text-gray-900 dark:text-white">
+              Danh mục *
+            </Label>
+            <select
+              id="category"
+              value={formData.category}
+              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+              className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={loading}
+            >
+              {categories.map((cat) => (
+                <option key={cat} value={cat} className="text-gray-900">{cat}</option>
+              ))}
+            </select>
+          </div>
 
-    try {
-      // Validate
-      if (!formData.title.trim()) {
-        setError('Vui lòng nhập tiêu đề')
-        return
-      }
-      if (!formData.excerpt.trim()) {
-        setError('Vui lòng nhập tóm tắt')
-        return
-      }
-      if (!formData.image.trim()) {
-        setError('Vui lòng thêm hình ảnh cho bài viết')
-        return
-      }
+          {/* Tác giả */}
+          <div className="space-y-2">
+            <Label htmlFor="author">Tác giả *</Label>
+            <Input
+              id="author"
+              value={formData.author}
+              onChange={(e) => setFormData({ ...formData, author: e.target.value })}
+              required
+              disabled={loading}
+            />
+          </div>
 
-      const blogData: any = {
-        title: formData.title.trim(),
-        excerpt: formData.excerpt.trim(),
-        content: formData.content?.trim() || '',
-        image: formData.image,
-        date: formData.date,
-        author: formData.author.trim() || user?.email?.split('@')[0] || 'Admin',
-        category: formData.category,
-        status: formData.status,
-        user_id: user?.id,
-      }
+          {/* Ngày đăng */}
+          <div className="space-y-2 text-">
+            <Label htmlFor="date">Ngày đăng *</Label>
+            <Input
+              id="date"
+              type="date"
+              value={formData.date}
+              onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+              required
+              disabled={loading}
+            />
+          </div>
 
-      console.log('Saving post data:', blogData)
+          {/* Trạng thái */}
+          <div className="space-y-2">
+            <Label htmlFor="status" className="text-gray-900 dark:text-white">
+              Trạng thái
+            </Label>
+            <select
+              id="status"
+              value={formData.status}
+              onChange={(e) => setFormData({ ...formData, status: e.target.value as 'draft' | 'published' })}
+              className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={loading}
+            >
+              <option value="draft" className="text-gray-900">Bản nháp</option>
+              <option value="published" className="text-gray-900">Xuất bản</option>
+            </select>
+          </div>
 
-      if (post?.id) {
-        // Update
-        const { error } = await supabase
-          .from('blog_posts')
-          .update(blogData)
-          .eq('id', post.id)
-
-        if (error) throw error
-      } else {
-        // Insert
-        const { error } = await supabase
-          .from('blog_posts')
-          .insert([blogData])
-
-        if (error) throw error
-      }
-
-      onSuccess()
-    } catch (error: any) {
-      console.error('Error saving post:', error)
-      setError(`Lỗi: ${error.message}`)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {error && (
-        <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-2">
-          <Label htmlFor="title">Tiêu đề *</Label>
-          <Input
-            id="title"
-            value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            required
-            disabled={loading}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="category">Danh mục *</Label>
-          <select
-            id="category"
-            value={formData.category}
-            onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-            disabled={loading}
-          >
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>{cat}</option>
-            ))}
-          </select>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="author">Tác giả *</Label>
-          <Input
-            id="author"
-            value={formData.author}
-            onChange={(e) => setFormData({ ...formData, author: e.target.value })}
-            required
-            disabled={loading}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="date">Ngày đăng *</Label>
-          <Input
-            id="date"
-            type="date"
-            value={formData.date}
-            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-            required
-            disabled={loading}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="status">Trạng thái</Label>
-          <select
-            id="status"
-            value={formData.status}
-            onChange={(e) => setFormData({ ...formData, status: e.target.value as 'draft' | 'published' })}
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-            disabled={loading}
-          >
-            <option value="draft">Bản nháp</option>
-            <option value="published">Xuất bản</option>
-          </select>
-        </div>
-
-        <div className="space-y-2 md:col-span-2">
-          <Label>Hình ảnh *</Label>
-          <div className="space-y-4">
-            {previewImage && (
-              <div className="relative w-full max-w-md">
-                <img
-                  src={previewImage}
-                  alt="Preview"
-                  className="w-full h-48 object-cover rounded-lg border"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x300?text=Image+Error'
-                  }}
-                />
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="destructive"
-                  className="absolute top-2 right-2"
-                  onClick={removeImage}
-                  disabled={loading || uploading}
-                >
-                  <X className="w-4 h-4" />
-                </Button>
+          {/* Image Preview */}
+          <div className="md:col-span-2 space-y-2">
+            <div className="flex items-center justify-between">
+              <Label>Hình ảnh chính *</Label>
+              <Badge variant={seoChecks.hasImage ? "default" : "outline"} className="text-xs">
+                {seoChecks.hasImage ? "✓ Có ảnh" : "Chưa có ảnh"}
+              </Badge>
+            </div>
+            
+            {previewImage ? (
+              <div className="space-y-3">
+                <div className="relative w-full max-w-md">
+                  <img
+                    src={previewImage}
+                    alt="Preview"
+                    className="w-full h-48 object-cover rounded-lg border"
+                  />
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="destructive"
+                    className="absolute top-2 right-2"
+                    onClick={removeImage}
+                    disabled={loading || uploading}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+                <div className="text-sm text-gray-600">
+                  <p className="flex items-center gap-1">
+                    <Eye className="w-3 h-3" />
+                    Ảnh sẽ hiển thị đầu bài viết và khi chia sẻ link
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                <p className="text-sm text-gray-500 mb-3">Chưa có hình ảnh</p>
               </div>
             )}
-            
+
             <div className="flex flex-col gap-4">
               <div className="flex gap-2">
                 <Input
-                  value={formData.image.startsWith('http') && !formData.image.includes('supabase.co/storage') ? formData.image : ''}
+                  value={formData.image.startsWith('http') && !formData.image.includes('supabase.co/storage')
+                    ? formData.image
+                    : ''}
                   onChange={(e) => handleImageUrlChange(e.target.value)}
                   placeholder="Nhập URL ảnh từ internet (https://...)"
                   disabled={loading || uploading}
@@ -294,8 +377,8 @@ export const BlogForm: React.FC<BlogFormProps> = ({ post, onSuccess }) => {
                   className="hidden"
                   disabled={loading || uploading}
                 />
-                <Button 
-                  type="button" 
+                <Button
+                  type="button"
                   variant="outline"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={loading || uploading}
@@ -309,65 +392,191 @@ export const BlogForm: React.FC<BlogFormProps> = ({ post, onSuccess }) => {
                   {uploading ? 'Đang upload...' : 'Upload ảnh'}
                 </Button>
               </div>
-              <p className="text-xs text-gray-500">
-                • Upload ảnh lên storage: JPG, PNG, GIF, WebP (tối đa 5MB)
-                <br />
-                • Hoặc nhập URL ảnh từ internet
-                <br />
-                • Ảnh sẽ được lưu trong Supabase Storage
-              </p>
+
+              <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded">
+                <p className="font-medium mb-1">📸 Lưu ý SEO cho ảnh:</p>
+                <ul className="space-y-1">
+                  <li>• Ảnh chất lượng cao, kích thước tối ưu (1200x630px cho social)</li>
+                  <li>• Đặt tên file có từ khóa: <code>tu-khoa-chinh.jpg</code></li>
+                  <li>• Dung lượng &lt; 500KB để tải nhanh</li>
+                </ul>
+              </div>
             </div>
           </div>
+
+          {/* Tóm tắt (Meta Description) */}
+          <div className="md:col-span-2 space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="excerpt">Tóm tắt (Meta Description) *</Label>
+              <Badge 
+                variant={
+                  formData.excerpt.length === 0 ? "outline" : 
+                  (formData.excerpt.length >= 120 && formData.excerpt.length <= 160) ? "default" : "destructive"
+                } 
+                className={`
+                  text-xs
+                  ${formData.excerpt.length >= 120 && formData.excerpt.length <= 160 ? 'bg-green-100 text-green-800 hover:bg-green-100' : ''}
+                `}
+              >
+                {formData.excerpt.length === 0 ? "Chưa nhập" : 
+                formData.excerpt.length < 120 ? `Thiếu ${120 - formData.excerpt.length} ký tự` :
+                formData.excerpt.length > 160 ? `Dư ${formData.excerpt.length - 160} ký tự` :
+                "✅ Tối ưu"}
+              </Badge>
+            </div>
+            <Textarea
+              id="excerpt"
+              value={formData.excerpt}
+              onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
+              rows={3}
+              required
+              disabled={loading}
+              placeholder="Mô tả ngắn gọn về bài viết. Đoạn này sẽ hiển thị trên kết quả tìm kiếm Google..."
+              maxLength={160}
+              className="placeholder:text-gray-400"
+            />
+            <div className="text-xs text-gray-500 space-y-1">
+              <p>Đây là <strong>meta description</strong> hiển thị trên Google.</p>
+              <p>Tối ưu: 120-160 ký tự, chứa từ khóa chính, kêu gọi hành động.</p>
+            </div>
+          </div>
+
+          <Separator className="md:col-span-2" />
+
+          {/* Nội dung chính với RichTextEditor */}
+          <div className="md:col-span-2 space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="content" className="text-gray-900 dark:text-white">
+                Nội dung chi tiết *
+              </Label>
+              <div className="flex gap-2">
+                <Badge 
+                  variant={seoChecks.hasHeadings ? "default" : "outline"} 
+                  className={`
+                    text-xs
+                    ${seoChecks.hasHeadings ? 'bg-green-100 text-green-800 hover:bg-green-100' : ''}
+                  `}
+                >
+                  {seoChecks.hasHeadings ? "✓ Có heading" : "Chưa có heading"}
+                </Badge>
+              </div>
+            </div>
+
+            {/* Hidden input cho form validation */}
+            <input
+              type="hidden"
+              id="content"
+              name="content"
+              value={formData.content}
+              required
+            />
+
+            {/* RichTextEditor */}
+            <div className="border border-gray-300 rounded-lg overflow-hidden">
+              <RichTextEditor
+                value={formData.content}
+                onChange={(html) => setFormData({ ...formData, content: html })}
+              />
+            </div>
+
+            
+            {/* SEO Checklist */}
+            {seoAdvice.length > 0 && (
+              <Alert className="bg-amber-50 border-amber-200">
+                <AlertCircle className="h-4 w-4 text-amber-600" />
+                <AlertDescription className="text-amber-800">
+                  <div className="font-medium mb-2">💡 Gợi ý SEO:</div>
+                  <ul className="text-sm space-y-1">
+                    {seoAdvice.map((item, index) => (
+                      <li key={index} className="flex items-center gap-2">
+                        <X className="h-3 w-3" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </AlertDescription>
+              </Alert>
+            )}
+            {/* HTML Preview (Collapsible) */}
+            {/* {formData.content && (
+              <details className="mt-4 border rounded-lg">
+                <summary className="px-4 py-3 text-sm font-medium cursor-pointer hover:bg-gray-50">
+                  🔍 Xem HTML/SEO code (dành cho developer)
+                </summary>
+                <div className="px-4 py-3 border-t bg-gray-900 text-gray-100">
+                  <div className="text-xs font-mono whitespace-pre-wrap overflow-auto max-h-60">
+                    {formData.content.substring(0, 1000)}
+                    {formData.content.length > 1000 && '...'}
+                  </div>
+                  <p className="text-xs text-gray-400 mt-2">
+                    HTML này sẽ được lưu vào database và hiển thị trên trang web.
+                  </p>
+                </div>
+              </details>
+            )} */}
+          </div>
+
         </div>
 
-        <div className="space-y-2 md:col-span-2">
-          <Label htmlFor="excerpt">Tóm tắt *</Label>
-          <Textarea
-            id="excerpt"
-            value={formData.excerpt}
-            onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
-            rows={2}
-            required
-            disabled={loading}
-            placeholder="Mô tả ngắn gọn về bài viết (hiển thị trên trang danh sách)"
-          />
+        {/* Tóm tắt SEO Score */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <h4 className="font-medium text-blue-800 mb-2 flex items-center gap-2">
+            📊 Điểm SEO ước tính
+          </h4>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+            {Object.entries(seoChecks).map(([key, value]) => (
+              <div key={key} className="flex items-center gap-2">
+                <div className={`h-3 w-3 rounded-full ${value ? 'bg-green-500' : 'bg-gray-300'}`} />
+                <span className="text-sm text-blue-700 capitalize">
+                  {key.replace('has', '').replace(/([A-Z])/g, ' $1').trim()}
+                </span>
+              </div>
+            ))}
+          </div>
+          <p className="text-xs text-blue-600 mt-3">
+            Điểm SEO cao giúp bài viết dễ được tìm thấy trên Google.
+          </p>
         </div>
 
-        <div className="space-y-2 md:col-span-2">
-          <Label htmlFor="content">Nội dung chi tiết *</Label>
-          <Textarea
-            id="content"
-            value={formData.content}
-            onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-            rows={8}
-            required
-            disabled={loading}
-            placeholder="Nội dung đầy đủ của bài viết..."
-          />
-        </div>
-      </div>
+        {/* Action Buttons */}
+        <div className="flex justify-between items-center pt-4 border-t">
+          <div className="text-sm text-gray-500">
+            <p>💡 <strong>Lưu ý:</strong> Nội dung HTML từ editor đã đầy đủ SEO.</p>
+          </div>
+          
+          <div className="flex space-x-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onSuccess}
+              disabled={loading}
+            >
+              Hủy
+            </Button>
 
-      <div className="flex justify-end space-x-3 pt-4">
-        <Button 
-          type="button" 
-          variant="outline" 
-          onClick={onSuccess}
-          disabled={loading}
-        >
-          Hủy
-        </Button>
-        <Button 
-          type="submit" 
-          disabled={loading || uploading}
-        >
-          {loading ? (
-            <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Đang lưu...
-            </>
-          ) : post?.id ? 'Cập nhật' : 'Tạo bài viết'}
-        </Button>
-      </div>
-    </form>
-  )
-}
+            <Button 
+              type="submit" 
+              disabled={loading || uploading}
+              className="min-w-[120px]"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Đang lưu...
+                </>
+              ) : post?.id ? (
+                'Cập nhật'
+              ) : (
+                'Tạo bài viết'
+              )}
+            </Button>
+          </div>
+        </div>
+        {error && (
+          <Alert variant="destructive">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+      </form>
+    )
+  }

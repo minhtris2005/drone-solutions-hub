@@ -137,7 +137,7 @@ if (name === 'name') {
           value={formData.name}
           onChange={handleChangeWithValidation}
           required
-          className={errors.name ? 'border-red-500 focus-visible:ring-red-500' : ''}
+          className={errors.name ? 'border-red-500 focus-visible:ring-red-500' : 'placeholder:text-gray-400'}
           maxLength={50}
         />
         <div className="flex justify-between items-center">
@@ -160,7 +160,7 @@ if (name === 'name') {
           placeholder="Hitek" 
           value={formData.company}
           onChange={handleChangeWithValidation}
-          className={errors.company ? 'border-red-500 focus-visible:ring-red-500' : ''}
+          className={errors.company ? 'border-red-500 focus-visible:ring-red-500' : 'placeholder:text-gray-400'}
           maxLength={100}
         />
         <div className="flex justify-between items-center">
@@ -186,7 +186,7 @@ if (name === 'name') {
             value={formData.email}
             onChange={handleChangeWithValidation}
             required
-            className={errors.email ? 'border-red-500 focus-visible:ring-red-500' : ''}
+            className={errors.email ? 'border-red-500 focus-visible:ring-red-500' : 'placeholder:text-gray-400'}
           />
           {errors.email && (
             <p className="mt-1 text-sm text-red-600">{errors.email}</p>
@@ -204,7 +204,7 @@ if (name === 'name') {
             value={formData.phone}
             onChange={handleChangeWithValidation}
             required
-            className={errors.phone ? 'border-red-500 focus-visible:ring-red-500' : ''}
+            className={errors.phone ? 'border-red-500 focus-visible:ring-red-500' : 'placeholder:text-gray-400'}
           />
           {errors.phone && (
             <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
@@ -244,7 +244,7 @@ if (name === 'name') {
             placeholder="Hồ Chí Minh" 
             value={formData.location}
             onChange={handleChangeWithValidation}
-            className={errors.location ? 'border-red-500 focus-visible:ring-red-500' : ''}
+            className={errors.location ? 'border-red-500 focus-visible:ring-red-500' : 'placeholder:text-gray-400'}
             maxLength={100}
           />
           <div className="flex justify-between items-center">
@@ -270,7 +270,7 @@ if (name === 'name') {
           value={formData.message}
           onChange={handleChangeWithValidation}
           required
-          className={errors.message ? 'border-red-500 focus-visible:ring-red-500' : ''}
+          className={errors.message ? 'border-red-500 focus-visible:ring-red-500' : 'placeholder:text-gray-400'}
           maxLength={1000}
         />
         <div className="flex justify-between items-center">

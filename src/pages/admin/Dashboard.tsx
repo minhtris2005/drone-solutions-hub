@@ -206,10 +206,10 @@ export default function Dashboard() {
                   {((stats.totalPublished / stats.totalPosts) * 100 || 0).toFixed(0)}% hoàn thành
                 </span>
               </div>
-              <h3 className="text-3xl font-bold text-gray-900 mb-1">{stats.totalPosts}</h3>
-              <p className="text-gray-600 font-medium">Tổng bài viết</p>
+              <h3 className="text-3xl font-bold text-pure-white mb-1">{stats.totalPosts}</h3>
+              <p className="text-pure-white font-medium">Tổng bài viết</p>
               <div className="mt-4">
-                <div className="flex justify-between text-sm text-gray-500 mb-1">
+                <div className="flex justify-between text-sm text-gray-300 mb-1">
                   <span>Đã công khai: {stats.totalPublished}</span>
                   <span>Bản nháp: {stats.totalDrafts}</span>
                 </div>
@@ -226,9 +226,9 @@ export default function Dashboard() {
                 </div>
                 <TrendingUp className="h-5 w-5 text-red-500" />
               </div>
-              <h3 className="text-3xl font-bold text-gray-900 mb-1">{formatNumber(stats.totalViews)}</h3>
-              <p className="text-gray-600 font-medium">Tổng lượt xem</p>
-              <div className="mt-4 flex items-center gap-2 text-sm text-gray-500">
+              <h3 className="text-3xl font-bold text-pure-white mb-1">{formatNumber(stats.totalViews)}</h3>
+              <p className="text-pure-white font-medium">Tổng lượt xem</p>
+              <div className="mt-4 flex items-center gap-2 text-sm text-gray-300">
                 <Clock className="h-4 w-4" />
                 <span>Trung bình: {stats.avgViews} lượt/bài</span>
               </div>
@@ -241,14 +241,14 @@ export default function Dashboard() {
                 <div className="p-3 bg-red-100 rounded-xl">
                   <BarChart className="h-6 w-6 text-red-600" />
                 </div>
-                <Badge variant="outline" className="bg-purple-50 text-red-700 border-purple-200">
+                <Badge variant="outline" className="text-red-600 bg-red-50">
                   {categories.length} danh mục
                 </Badge>
               </div>
-              <h3 className="text-3xl font-bold text-gray-900 mb-1">{stats.topCategory}</h3>
-              <p className="text-gray-600 font-medium">Danh mục phổ biến</p>
+              <h3 className="text-3xl font-bold text-pure-white mb-1">{stats.topCategory}</h3>
+              <p className="text-pure-white font-medium">Danh mục phổ biến</p>
               <div className="mt-4">
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-300">
                   {categories.length > 0 ? (
                     `${categories[0].count} bài viết`
                   ) : (
@@ -273,10 +273,10 @@ export default function Dashboard() {
                   {stats.recentActivity > 0 ? 'Đang hoạt động' : 'Không có hoạt động'}
                 </span>
               </div>
-              <h3 className="text-3xl font-bold text-gray-900 mb-1">{stats.recentActivity}</h3>
-              <p className="text-gray-600 font-medium">Hoạt động 7 ngày</p>
+              <h3 className="text-3xl font-bold text-pure-white mb-1">{stats.recentActivity}</h3>
+              <p className="text-pure-white font-medium">Hoạt động 7 ngày</p>
               <div className="mt-4">
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-300">
                   {stats.recentActivity > 0 
                     ? `Có ${stats.recentActivity} bài viết mới` 
                     : 'Chưa có bài viết mới'}
@@ -331,30 +331,30 @@ export default function Dashboard() {
               ) : (
                 <div className="divide-y divide-gray-100">
                   {recentPosts.map((post, index) => (
-                    <div key={post.id} className="p-4 hover:bg-gray-50 transition-colors duration-150">
+                    <div key={post.id} className="p-4 transition-colors duration-150">
                       <div className="flex items-start justify-between">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-3 mb-2">
-                            <h4 className="font-medium text-gray-900 truncate">{post.title}</h4>
+                            <h4 className="font-medium text-pure-white truncate">{post.title}</h4>
                             <span 
                               className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold pointer-events-none ${post.status === 'published' ? 'bg-red-600 text-white' : 'bg-red-400 text-white'}`}
                             >
                               {post.status === 'published' ? 'Công khai' : 'Nháp'}
                             </span>
                           </div>
-                          <div className="flex items-center gap-4 text-sm text-gray-500">
+                          <div className="flex items-center gap-4 text-sm text-gray-300">
                             <span className="flex items-center gap-1">
                               <Calendar className="h-3 w-3" />
                               {post.date || new Date(post.created_at).toLocaleDateString('vi-VN')}
                             </span>
                             <span className="flex items-center gap-1">
-                              <Eye className="h-3 w-3" />
+                              <Eye className="h-3 w-3 " />
                               {post.views || 0} lượt xem
                             </span>
-                            <span className="px-2 py-0.5 bg-gray-100 rounded text-xs">
+                            <span className="px-2 py-0.5 bg-gray-700 rounded text-xs">
                               {post.category}
                             </span>
-                            <span className="text-xs text-gray-400">
+                            <span className="text-xs text-gray-300">
                               {getTimeAgo(post.created_at)}
                             </span>
                           </div>
@@ -389,13 +389,13 @@ export default function Dashboard() {
                 ) : (
                   <div className="space-y-4">
                     {popularPosts.map((post, index) => (
-                      <div key={post.id} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                      <div key={post.id} className="flex items-center gap-3 p-3 rounded-lg">
                         <div className="flex-shrink-0 w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
                           <span className="font-bold text-red-600 text-sm">{index + 1}</span>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-gray-900 truncate">{post.title}</p>
-                          <div className="flex items-center gap-2 text-sm text-gray-500">
+                          <p className="font-medium text-pure-white truncate">{post.title}</p>
+                          <div className="flex items-center gap-2 text-sm text-gray-300">
                             <span className="flex items-center gap-1">
                               <Eye className="h-3 w-3" />
                               {post.views?.toLocaleString() || 0}
@@ -414,7 +414,7 @@ export default function Dashboard() {
             {/* Categories */}
             <Card className="border border-gray-200 shadow-sm">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 ">
                   <FileText className="h-5 w-5 text-vibrant-red" />
                   Phân loại danh mục
                 </CardTitle>
@@ -433,13 +433,13 @@ export default function Dashboard() {
                     {categories.map((category, index) => {
                       const percentage = (category.count / stats.totalPosts) * 100
                       return (
-                        <div key={index} className="space-y-2">
+                        <div key={index} className="space-y-2 ">
                           <div className="flex justify-between items-center">
-                            <span className="font-medium text-gray-700">{category.name}</span>
-                            <span className="text-sm font-semibold text-gray-900">{category.count} bài</span>
+                            <span className="font-medium text-pure-white">{category.name}</span>
+                            <span className="text-sm font-semibold text-gray-300">{category.count} bài</span>
                           </div>
                           <Progress value={percentage} className="h-2" />
-                          <div className="flex justify-between text-xs text-gray-500">
+                          <div className="flex justify-between text-xs text-gray-300">
                             <span>{percentage.toFixed(1)}%</span>
                             <span>{category.count} / {stats.totalPosts} bài viết</span>
                           </div>
@@ -455,25 +455,24 @@ export default function Dashboard() {
 
       </div>
       {/* Thêm Dialog form cho tạo bài viết */}
-<Dialog open={showForm} onOpenChange={setShowForm}>
-  <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-    <DialogHeader>
-      <DialogTitle>
-        {selectedPost ? 'Chỉnh sửa bài viết' : 'Bài viết mới'}
-      </DialogTitle>
-      <DialogDescription>
-        {selectedPost ? 'Cập nhật nội dung bài viết' : 'Tạo bài viết mới cho blog'}
-      </DialogDescription>
-    </DialogHeader>
-    <BlogForm
-      post={selectedPost}
-      onSuccess={() => {
-        setShowForm(false)
-        fetchDashboardData() // Reload data after success
-      }}
-    />
-  </DialogContent>
-</Dialog>
+      <Dialog open={showForm} onOpenChange={setShowForm}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {selectedPost ? "Chỉnh sửa bài viết" : "Tạo bài viết mới"}
+            </DialogTitle>
+          </DialogHeader>
+
+          <BlogForm
+            post={selectedPost}
+            onSuccess={() => {
+              setShowForm(false)
+              fetchDashboardData()
+            }}
+          />
+        </DialogContent>
+      </Dialog>
+
     </div>
   )
 }

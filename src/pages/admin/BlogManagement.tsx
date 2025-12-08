@@ -227,7 +227,7 @@ export default function BlogManagement() {
   return (
     <div className="space-y-6">
       {/* ... (giữ nguyên phần header) ... */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-between ml-3 mt-3 sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
             Quản lý Blog
@@ -429,19 +429,8 @@ export default function BlogManagement() {
                             Chỉnh sửa
                           </DropdownMenuItem>
                           
-                          {/* Preview Item - chỉ clickable khi là draft */}
-                          <DropdownMenuItem 
-                            onClick={() => post.status === 'draft' && handlePreviewPost(post)}
-                            className={post.status === 'published' ? 'opacity-50 cursor-not-allowed' : ''}
-                            disabled={post.status === 'published'}
-                          >
-                            <Eye className="h-4 w-4 mr-2" />
-                            Xem trước
-                            {post.status === 'published' && <span className="ml-2 text-xs text-gray-500">(Chỉ dành cho bài nháp)</span>}
-                          </DropdownMenuItem>
-                          
-                          {/* Item xem bài viết nếu đã published */}
-                          {post.status === 'published' && (
+                          {/* CHỈ HIỆN KHI LÀ BẢN NHÁP (draft) */}
+                          {post.status === 'draft' && (
                             <DropdownMenuItem onClick={() => window.open(`/blog/${post.id}`, '_blank')}>
                               <Eye className="h-4 w-4 mr-2" />
                               Xem bài viết
@@ -495,12 +484,11 @@ export default function BlogManagement() {
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {selectedPost ? 'Chỉnh sửa bài viết' : 'Bài viết mới'}
+              {selectedPost ? "Chỉnh sửa bài viết" : "Tạo bài viết mới"}
             </DialogTitle>
-            <DialogDescription>
-              {selectedPost ? 'Cập nhật nội dung bài viết' : 'Tạo bài viết mới cho blog'}
-            </DialogDescription>
           </DialogHeader>
+
+          {/* Form */}
           <BlogForm
             post={selectedPost}
             onSuccess={() => {
@@ -510,6 +498,7 @@ export default function BlogManagement() {
           />
         </DialogContent>
       </Dialog>
+
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={!!deleteConfirm} onOpenChange={() => setDeleteConfirm(null)}>

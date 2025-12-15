@@ -257,7 +257,7 @@ export default function TrustedClientsSection() {
         </div>
 
         {/* CTA Section */}
-        <motion.div
+        {/* <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ delay: 0.8, duration: 0.6 }}
@@ -279,7 +279,7 @@ export default function TrustedClientsSection() {
               </motion.button>
             </div>
           </div>
-        </motion.div>
+        </motion.div> */}
       </div>
     </section>
   );

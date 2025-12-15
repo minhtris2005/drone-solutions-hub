@@ -6,6 +6,7 @@ const BlogControls: React.FC<BlogControlsProps> = ({
   onPrev,
   onNext,
   onViewDetails,
+  onViewAllPosts, // ĐÃ CÓ PROP NÀY
   currentPostId,
   prevBtnRef,
   nextBtnRef
@@ -14,16 +15,29 @@ const BlogControls: React.FC<BlogControlsProps> = ({
     <>
       {/* Container cho tất cả button - CANH TRÁI */}
       <div className="space-y-10 opacity-0 animate-showContent animation-delay-600">
-        {/* Single Button - XEM CHI TIẾT */}
-        <div>
-          <button
-            onClick={(e) => onViewDetails(currentPostId, e)}
-            className="bg-[#d62323] text-black font-medium tracking-wider py-3 px-10 hover:bg-red-400 transition-colors text-lg min-w-[220px] text-left rounded-3xl"
-            aria-label={`Xem chi tiết bài viết`}
-          >
-            XEM CHI TIẾT →
-          </button>
+        <div className="flex">
+          {/* Single Button - XEM CHI TIẾT */}
+          <div>
+            <button
+              onClick={(e) => onViewDetails(currentPostId, e)}
+              className="mr-3 bg-[#d62323] text-black font-medium tracking-wider py-3 px-10 hover:bg-red-400 transition-colors text-lg min-w-[220px] text-left rounded-3xl"
+              aria-label={`Xem chi tiết bài viết`}
+            >
+              XEM CHI TIẾT →
+            </button>
+          </div>
+          {/* Nút XEM TẤT CẢ BÀI VIẾT - SỬA LẠI Ở ĐÂY */}
+          <div>
+            <button
+              onClick={onViewAllPosts}
+              className="bg-[#d62323] text-black font-medium tracking-wider py-3 px-10 hover:bg-red-400 transition-colors text-lg min-w-[220px] text-left rounded-3xl"
+              aria-label={`Xem tất cả bài viết`}
+            >
+              XEM TẤT CẢ BÀI VIẾT
+            </button>
+          </div>
         </div>
+        
 
         {/* Navigation Arrows - NẰM NGANG DƯỚI NÚT XEM CHI TIẾT */}
         <div className="flex items-center gap-4">

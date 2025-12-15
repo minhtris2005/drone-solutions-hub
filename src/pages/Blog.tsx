@@ -7,6 +7,7 @@ import {
   ThumbnailCarousel,
   BlogControls,
   BlogSEO,
+  AllBlogsPage,
   EnhancedBlogPost,
   getFallbackImage,
   getDefaultPosts,
@@ -22,6 +23,7 @@ export default function Blog() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [nextPostId, setNextPostId] = useState<string | null>(null);
   const [prevPostId, setPrevPostId] = useState<string | null>(null);
+  const [showBackToTop, setShowBackToTop] = useState(false); // Thêm state cho nút back to top
   
   const navigate = useNavigate();
   const carouselRef = useRef<HTMLDivElement>(null);
@@ -29,10 +31,24 @@ export default function Blog() {
   const prevBtnRef = useRef<HTMLButtonElement>(null);
   const thumbnailContainerRef = useRef<HTMLDivElement>(null);
   const backgroundImageRef = useRef<HTMLImageElement>(null);
+  const allBlogsRef = useRef<HTMLDivElement>(null); // Ref để scroll đến
 
-  // Fetch dữ liệu từ Supabase
+  // Fetch dữ liệu blog chính (6 bài đầu)
   useEffect(() => {
     fetchBlogPosts();
+  }, []);
+
+  // Thêm scroll listener để hiện nút "Back to Top"
+  useEffect(() => {
+    const handleScroll = () => {
+      if (allBlogsRef.current) {
+        const rect = allBlogsRef.current.getBoundingClientRect();
+        setShowBackToTop(rect.top < 0); // Nếu AllBlogsPage đã scroll lên trên viewport
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   // Cập nhật next/prev post ID
@@ -72,6 +88,24 @@ export default function Blog() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Hàm scroll xuống AllBlogsPage
+  const scrollToAllBlogs = () => {
+    if (allBlogsRef.current) {
+      allBlogsRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  };
+
+  // Hàm scroll lên đầu trang
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
   };
 
   // Hàm chuyển slide với hiệu ứng
@@ -176,18 +210,16 @@ export default function Blog() {
 
   // Xử lý click thumbnail
   const handleThumbnailClick = (clickedIndex: number) => {
-  // Chỉ cập nhật currentIndex nếu cần (cho carousel chính)
-  if (!isAnimating && clickedIndex !== currentIndex) {
-    setCurrentIndex(clickedIndex);
-  }
-};
+    if (!isAnimating && clickedIndex !== currentIndex) {
+      setCurrentIndex(clickedIndex);
+    }
+  };
 
   // Xử lý click xem chi tiết
   const handleViewDetails = (postId: string, e?: React.MouseEvent) => {
     if (e) e.preventDefault();
     navigate(`/blog/${postId}`);
   };
-
 
   // Lấy các bài viết cho thumbnail
   const getThumbnailPosts = () => {
@@ -227,106 +259,127 @@ export default function Blog() {
   const thumbnailPosts = getThumbnailPosts();
 
   return (
-  <div 
-    ref={carouselRef}
-    className="w-full h-screen overflow-hidden relative bg-black"
-  >
-    <BlogSEO 
-      blogPosts={blogPosts}
-      currentPost={currentPost}
-      currentIndex={currentIndex}
-    />
+    <div className="relative">
+      {/* Phần Blog Carousel chính */}
+      <div 
+        ref={carouselRef}
+        className="w-full h-screen overflow-hidden relative bg-black"
+      >
+        <BlogSEO 
+          blogPosts={blogPosts}
+          currentPost={currentPost}
+          currentIndex={currentIndex}
+        />
 
-    {/* THÊM blogPostsLength vào BlogCarousel */}
-    <BlogCarousel
-      currentPost={currentPost}
-      currentIndex={currentIndex}
-      blogPostsLength={blogPosts.length} // THÊM DÒNG NÀY
-      backgroundImageRef={backgroundImageRef}
-      getFallbackImage={getFallbackImage}
-    >
-      {/* XÓA currentIndex và blogPostsLength khỏi BlogControls */}
-      <BlogControls
-        isAnimating={isAnimating}
-        onPrev={() => showSlider('prev')}
-        onNext={() => showSlider('next')}
-        onViewDetails={handleViewDetails}
-        currentPostId={currentPost.id}
-        prevBtnRef={prevBtnRef}
-        nextBtnRef={nextBtnRef}
-      />
-    </BlogCarousel>
+        <BlogCarousel
+          currentPost={currentPost}
+          currentIndex={currentIndex}
+          blogPostsLength={blogPosts.length}
+          backgroundImageRef={backgroundImageRef}
+          getFallbackImage={getFallbackImage}
+        >
+          <BlogControls
+            isAnimating={isAnimating}
+            onPrev={() => showSlider('prev')}
+            onNext={() => showSlider('next')}
+            onViewDetails={handleViewDetails}
+            onViewAllPosts={scrollToAllBlogs} // Scroll xuống AllBlogs
+            currentPostId={currentPost.id}
+            prevBtnRef={prevBtnRef}
+            nextBtnRef={nextBtnRef}
+          />
+        </BlogCarousel>
 
-    <ThumbnailCarousel
-      thumbnailPosts={thumbnailPosts}
-      isAnimating={isAnimating}
-      onThumbnailClick={handleThumbnailClick}
-      getFallbackImage={getFallbackImage}
-      thumbnailContainerRef={thumbnailContainerRef}
-    />
+        <ThumbnailCarousel
+          thumbnailPosts={thumbnailPosts}
+          isAnimating={isAnimating}
+          onThumbnailClick={handleThumbnailClick}
+          getFallbackImage={getFallbackImage}
+          thumbnailContainerRef={thumbnailContainerRef}
+        />
+      </div>
 
-    {/* CSS Animation */}
-    <style jsx>{`
-      @keyframes showContent {
-        0% { opacity: 0; transform: translateY(30px); filter: blur(5px); }
-        100% { opacity: 1; transform: translateY(0); filter: blur(0); }
-      }
-      .animate-showContent { animation: showContent 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
-      .animation-delay-200 { animation-delay: 0.2s; }
-      .animation-delay-400 { animation-delay: 0.4s; }
-      .animation-delay-600 { animation-delay: 0.6s; }
-      .animation-delay-800 { animation-delay: 0.8s; }
-      
-      .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-      .scrollbar-hide::-webkit-scrollbar { display: none; }
-      
-      img { transition: opacity 0.5s ease-in-out; }
-      
-      @media (max-width: 768px) {
-        .thumbnail { 
-          max-width: 70vw !important; 
-          right: 4px !important; 
-          bottom: 4px !important; 
+      {/* Phần AllBlogsPage - LUÔN HIỆN */}
+      <div ref={allBlogsRef} className="relative">
+        <AllBlogsPage
+          getFallbackImage={getFallbackImage}
+          onBack={scrollToTop} // Scroll lên đầu trang
+        />
+      </div>
+
+      {/* Nút Back to Top - chỉ hiện khi scroll xuống */}
+      {showBackToTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-8 right-8 z-50 bg-[#d62323] text-white p-3 rounded-full shadow-lg hover:bg-red-600 transition-colors animate-bounce"
+          aria-label="Quay lại đầu trang"
+        >
+          ↑
+        </button>
+      )}
+
+      {/* CSS Animation */}
+      <style jsx>{`
+        @keyframes showContent {
+          0% { opacity: 0; transform: translateY(30px); filter: blur(5px); }
+          100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+        }
+        .animate-showContent { animation: showContent 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+        .animation-delay-200 { animation-delay: 0.2s; }
+        .animation-delay-400 { animation-delay: 0.4s; }
+        .animation-delay-600 { animation-delay: 0.6s; }
+        .animation-delay-800 { animation-delay: 0.8s; }
+        
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        
+        img { transition: opacity 0.5s ease-in-out; }
+        
+        @media (max-width: 768px) {
+          .thumbnail { 
+            max-width: 70vw !important; 
+            right: 4px !important; 
+            bottom: 4px !important; 
+          }
+          
+          .thumbnail .item { 
+            width: 100px !important; 
+            height: 140px !important; 
+          }
+          
+          .title { 
+            font-size: 2.2rem !important; 
+            margin-bottom: 0.75rem !important;
+          }
+          
+          .topic { 
+            font-size: 1.75rem !important; 
+            margin-bottom: 2rem !important;
+          }
+          
+          .max-w-xs {
+            max-width: 180px !important;
+          }
+          
+          .px-12 {
+            padding-left: 2rem !important;
+            padding-right: 2rem !important;
+          }
+          
+          .tracking-\[0\.5em\] {
+            letter-spacing: 0.3em !important;
+          }
         }
         
-        .thumbnail .item { 
-          width: 100px !important; 
-          height: 140px !important; 
+        button:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
         
-        .title { 
-          font-size: 2.2rem !important; 
-          margin-bottom: 0.75rem !important;
+        button:active {
+          transform: translateY(0);
         }
-        
-        .topic { 
-          font-size: 1.75rem !important; 
-          margin-bottom: 2rem !important;
-        }
-        
-        .max-w-xs {
-          max-width: 180px !important;
-        }
-        
-        .px-12 {
-          padding-left: 2rem !important;
-          padding-right: 2rem !important;
-        }
-        
-        .tracking-\[0\.5em\] {
-          letter-spacing: 0.3em !important;
-        }
-      }
-      
-      button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-      }
-      
-      button:active {
-        transform: translateY(0);
-      }
-    `}</style>
-  </div>
-);
+      `}</style>
+    </div>
+  );
 }

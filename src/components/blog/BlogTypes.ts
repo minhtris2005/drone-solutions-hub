@@ -25,6 +25,7 @@ export interface BlogControlsProps {
   onPrev: () => void;
   onNext: () => void;
   onViewDetails: (postId: string, e?: React.MouseEvent) => void;
+  onViewAllPosts?: () => void; // THÊM PROP NÀY
   currentPostId: string;
   prevBtnRef: React.RefObject<HTMLButtonElement>;
   nextBtnRef: React.RefObject<HTMLButtonElement>;

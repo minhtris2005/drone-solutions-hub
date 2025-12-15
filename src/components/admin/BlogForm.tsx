@@ -8,7 +8,7 @@
   import { Label } from '@/components/ui/label'
   import { Upload, X, Loader2, AlertCircle, Check, Eye } from 'lucide-react'
   import { Alert, AlertDescription } from '@/components/ui/alert'
-  import RichTextEditor from "@/components/RichTextEditor"
+  import RichTextEditor from "@/components/RichTextEditorQuill"
   import { Badge } from "@/components/ui/badge"
   import { Separator } from "@/components/ui/separator"
 
@@ -367,6 +367,7 @@
                   onChange={(e) => handleImageUrlChange(e.target.value)}
                   placeholder="Nhập URL ảnh từ internet (https://...)"
                   disabled={loading || uploading}
+                  className='placeholder:text-gray-400'
                 />
                 <span className="text-sm text-gray-500 self-center">hoặc</span>
                 <input
@@ -391,15 +392,6 @@
                   )}
                   {uploading ? 'Đang upload...' : 'Upload ảnh'}
                 </Button>
-              </div>
-
-              <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded">
-                <p className="font-medium mb-1">📸 Lưu ý SEO cho ảnh:</p>
-                <ul className="space-y-1">
-                  <li>• Ảnh chất lượng cao, kích thước tối ưu (1200x630px cho social)</li>
-                  <li>• Đặt tên file có từ khóa: <code>tu-khoa-chinh.jpg</code></li>
-                  <li>• Dung lượng &lt; 500KB để tải nhanh</li>
-                </ul>
               </div>
             </div>
           </div>
@@ -480,23 +472,6 @@
             </div>
 
             
-            {/* SEO Checklist */}
-            {seoAdvice.length > 0 && (
-              <Alert className="bg-amber-50 border-amber-200">
-                <AlertCircle className="h-4 w-4 text-amber-600" />
-                <AlertDescription className="text-amber-800">
-                  <div className="font-medium mb-2">💡 Gợi ý SEO:</div>
-                  <ul className="text-sm space-y-1">
-                    {seoAdvice.map((item, index) => (
-                      <li key={index} className="flex items-center gap-2">
-                        <X className="h-3 w-3" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </AlertDescription>
-              </Alert>
-            )}
           </div>
 
         </div>

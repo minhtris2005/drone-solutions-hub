@@ -73,7 +73,7 @@ const QuoteSection = () => {
   return (
     <section 
       ref={ref}
-      className="py-20 relative overflow-hidden bg-secondary"
+      className="py-20 relative overflow-hidden bg-background"
     >
       {/* Background Elements */}
       <div className="absolute inset-0">

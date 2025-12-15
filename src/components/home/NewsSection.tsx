@@ -110,7 +110,7 @@ export default function NewsSection() {
   return (
     <section 
       ref={ref}
-      className="py-20 bg-gradient-to-b from-background to-red-50/20 dark:from-gray-900 dark:to-red-900/10"
+      className="py-20 bg-secondary dark:from-gray-900 dark:to-red-900/10"
     >
       <div className="container mx-auto px-4">
         {/* Header */}
